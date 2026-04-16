@@ -8,6 +8,7 @@ import { clearChat } from '@/lib/firebase/firestore';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { Loader } from '@/components/ui/Loader';
 import Swal from 'sweetalert2';
+import { useChatStore } from '@/store/useChatStore';
 
 import { Sidebar } from '@/components/layout/Sidebar';
 

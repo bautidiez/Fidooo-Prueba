@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { addMessage } from '@/lib/firebase/firestore';
+import { addMessage, createConversation } from '@/lib/firebase/firestore';
 import { useAuth, getIdToken } from '@/hooks/useAuth';
 import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
 import { useChatStore } from '@/store/useChatStore';
