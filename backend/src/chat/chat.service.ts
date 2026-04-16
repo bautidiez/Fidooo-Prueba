@@ -44,11 +44,16 @@ export class ChatService {
     }
 
     // Guardar respuesta del asistente en Firestore
-    await this.firestoreService.addMessage({
-      userId,
-      content: reply,
-      role: 'assistant',
-    });
+    try {
+      await this.firestoreService.addMessage({
+        userId,
+        content: reply,
+        role: 'assistant',
+      });
+    } catch (dbError: any) {
+      this.logger.error(`Error al guardar en Firestore: ${dbError.message}`, dbError);
+      throw new Error(`La IA respondió, pero falló el guardado en la base de datos: ${dbError.message}. Revisá tus credenciales de Firebase en Vercel.`);
+    }
 
     return { reply };
   }
