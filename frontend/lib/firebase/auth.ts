@@ -48,11 +48,27 @@ export async function resetPassword(email: string): Promise<void> {
 }
 
 export async function checkEmailExists(email: string): Promise<boolean> {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://fidooo-prueba.vercel.app/api';
+  let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+  
+  // Si no hay URL, intentamos una ruta por defecto o fallamos seguro
+  if (!backendUrl) {
+    console.warn('NEXT_PUBLIC_BACKEND_URL is not defined.');
+    return true;
+  }
+
+  // Aseguramos que tenga el protocolo https://
+  if (!backendUrl.startsWith('http')) {
+    backendUrl = `https://${backendUrl}`;
+  }
+
+  // Limpiamos barras diagonales al final para evitar // en la URL
+  backendUrl = backendUrl.replace(/\/+$/, '');
   
   try {
-    console.log(`Checking email existence at: ${backendUrl}/auth/check-email`);
-    const response = await fetch(`${backendUrl}/auth/check-email`, {
+    const targetUrl = `${backendUrl}/auth/check-email`;
+    console.log(`Checking email existence at: ${targetUrl}`);
+    
+    const response = await fetch(targetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
