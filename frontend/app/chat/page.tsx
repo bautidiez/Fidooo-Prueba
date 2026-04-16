@@ -87,7 +87,7 @@ export default function ChatPage() {
         <div className="flex items-center gap-2">
           <div className="relative size-12 shrink-0 pointer-events-none drop-shadow-[0_0_15px_rgba(30,187,244,0.4)]">
             <Image 
-              src="/assets/logo.png" 
+              src="/assets/assistant-logo.png" 
               alt="Fidooo Logo" 
               fill
               className="object-contain transition-transform duration-700 hover:scale-110"

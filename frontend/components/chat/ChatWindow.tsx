@@ -101,7 +101,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden z-0 opacity-[0.04]">
         <div className="relative w-[400px] h-[400px]">
            <Image 
-             src="/assets/logo.png" 
+             src="/assets/assistant-logo.png" 
              alt="Watermark" 
              fill 
              className="object-contain grayscale brightness-200 contrast-150" 
@@ -115,7 +115,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         <div className="flex h-full flex-col items-center justify-center p-4">
           <div className="mb-6 flex size-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-[#1ebbf4]/20 to-[#84d6f6]/10 ring-1 ring-[#1ebbf4]/30 shadow-[0_0_50px_rgba(30,187,244,0.1)] animate-pulse overflow-hidden relative group">
              <Image 
-               src="/assets/logo.png" 
+               src="/assets/assistant-logo.png" 
                alt="AI" 
                fill 
                className="object-contain p-4 transition-transform duration-1000 group-hover:scale-110" 
