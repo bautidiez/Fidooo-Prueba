@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const PROTECTED_PATHS = ['/chat'];
 const AUTH_PATHS = ['/login'];
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('__session');
   const isAuthenticated = Boolean(sessionCookie?.value);
