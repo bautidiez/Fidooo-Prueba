@@ -30,8 +30,8 @@ export class GeminiService implements OnModuleInit {
 
     try {
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      this.logger.log('Google Gemini client initialized (gemini-1.5-flash)');
+      this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+      this.logger.log('Google Gemini client initialized (gemini-1.5-flash-latest)');
     } catch (error) {
       this.logger.error('Error initializing Gemini AI', error);
       this.isMockMode = true;
@@ -39,8 +39,17 @@ export class GeminiService implements OnModuleInit {
   }
 
   async generateReply(userMessage: string): Promise<string> {
+    const apiKey = this.configService.get('gemini', { infer: true }).apiKey;
+    
+    // Verificación defensiva del formato de la clave
+    if (apiKey && !apiKey.startsWith('AIza')) {
+      throw new InternalServerErrorException(
+        'La GEMINI_API_KEY configurada en Vercel es inválida. Debe empezar con "AIza". Por favor, generá una nueva en aistudio.google.com'
+      );
+    }
+
     if (this.isMockMode || !this.model) {
-      return '¡Hola! Soy FibooChat. El sistema está funcionando pero todavía no tengo activada mi inteligencia de Google (Gemini).';
+      return '¡Hola! Soy FibooChat. El sistema está funcionando pero el motor de IA no está configurado correctamente.';
     }
 
     try {
