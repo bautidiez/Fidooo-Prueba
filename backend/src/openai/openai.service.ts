@@ -67,12 +67,14 @@ export class OpenAiService implements OnModuleInit {
       }
 
       return reply;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof InternalServerErrorException) throw error;
 
-      this.logger.error('Error calling OpenAI API', error);
+      const errorMessage = error?.message || 'Error desconocido';
+      this.logger.error(`Error calling OpenAI API: ${errorMessage}`, error);
+      
       throw new InternalServerErrorException(
-        'Error al comunicarse con el servicio de IA. Intentá de nuevo.',
+        `Error OpenAI: ${errorMessage}. Revisá tu API Key y saldo en platform.openai.com`,
       );
     }
   }
