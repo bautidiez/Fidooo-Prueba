@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { Message } from '@/types/message.types';
 
 interface MessageBubbleProps {
@@ -13,17 +15,6 @@ function formatTime(createdAt: Message['createdAt']): string {
 
 export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
   const isUser = message.role === 'user';
-
-  // Helper to render basic markdown (bold)
-  const renderContent = (content: string) => {
-    const parts = content.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, i) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{part.slice(2, -2)}</strong>;
-      }
-      return part;
-    });
-  };
 
   return (
     <div
@@ -48,7 +39,7 @@ export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
           <img src="/assets/assistant-logo.png" alt="AI" className="size-full object-cover" />
         )}
       </div>
- 
+
       {/* Bubble */}
       <div
         className={`relative max-w-[80%] rounded-3xl px-5 py-4 text-[15px] leading-relaxed backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
@@ -57,7 +48,18 @@ export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
             : 'rounded-tl-sm border border-[#1ebbf4]/20 bg-gradient-to-br from-[#1ebbf4]/10 to-[#84d6f6]/5 text-white/90 shadow-[0_0_15px_rgba(30,187,244,0.1)]'
         }`}
       >
-        <p className="whitespace-pre-wrap break-words">{renderContent(message.content)}</p>
+        <div className="prose prose-invert max-w-none">
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
+              strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
+              em: ({ children }) => <em className="italic text-[#1ebbf4]/90">{children}</em>,
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        </div>
         <span
           className={`mt-2 block text-right text-[10px] uppercase tracking-wider font-semibold ${isUser ? 'text-white/40' : 'text-[#1ebbf4]/70'}`}
         >
