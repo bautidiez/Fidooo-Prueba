@@ -25,8 +25,8 @@ BACKEND_URL = BACKEND_URL.replace(/\/$/, ''); // Quitar barra final si existe
 
 export function ChatWindow({ userId }: ChatWindowProps) {
   const { user } = useAuth();
-  const { messages, isReplying } = useRealtimeMessages(userId);
-  const { setReplying } = useChatStore();
+  const { activeConversationId, setActiveConversationId, setReplying, isReplying } = useChatStore();
+  const { messages } = useRealtimeMessages(userId, activeConversationId);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Usuario';
@@ -42,21 +42,32 @@ export function ChatWindow({ userId }: ChatWindowProps) {
     setReplying(true);
 
     try {
-      // 1. Save user message to Firestore
-      await addMessage(userId, content, 'user');
+      let currentConvId = activeConversationId;
 
-      // 2. Get Firebase ID token
+      // 1. Create conversation if none exists
+      if (!currentConvId) {
+        currentConvId = await createConversation(userId, content.slice(0, 40));
+        setActiveConversationId(currentConvId);
+      }
+
+      // 2. Save user message to Firestore
+      await addMessage(userId, currentConvId, content, 'user');
+
+      // 3. Get Firebase ID token
       const idToken = await getIdToken();
       if (!idToken) throw new Error('Sesión expirada. Por favor, reingresá.');
 
-      // 3. Call backend
+      // 4. Call backend
       const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ message: content }),
+        body: JSON.stringify({ 
+          message: content,
+          conversationId: currentConvId 
+        }),
       });
 
       if (!response.ok) {
@@ -65,9 +76,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
           const data = (await response.json()) as { message?: string };
           throw new Error(data.message ?? 'Error en la respuesta de IA');
         } else {
-          const text = await response.text();
-          console.error('Backend returned non-JSON response:', text);
-          throw new Error(`Error HTML. URL llamada: ${BACKEND_URL}. Verificá fidooo-backend en Vercel.`);
+          throw new Error('Error en la comunicación con el servidor AI.');
         }
       }
 
@@ -76,19 +85,14 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       console.error('Error sending message:', error);
       const errorMessage = error.message || 'Error de conexión / Permisos';
       
-      // Intentamos mostrar el error en el chat si es posible, sino lanzamos un alert
-      try {
-        await addMessage(userId, `⚠️ Error: ${errorMessage}. Verificá si activaste las 'Reglas' en Firebase.`, 'assistant');
-      } catch (e) {
-        Swal.fire({
-           title: 'Falla Crítica',
-           text: `No se pudo conectar con Firebase: ${errorMessage}. ¿Pegaste las Reglas en la consola?`,
-           icon: 'error',
-           background: '#1c1c1c',
-           color: '#fff',
-           confirmButtonColor: '#f43f5e',
-           confirmButtonText: 'Entendido'
-        });
+      if (activeConversationId) {
+        try {
+          await addMessage(userId, activeConversationId, `⚠️ Error: ${errorMessage}`, 'assistant');
+        } catch (e) {
+          Swal.fire({ title: 'Falla Crítica', text: errorMessage, icon: 'error' });
+        }
+      } else {
+        Swal.fire({ title: 'Falla Crítica', text: errorMessage, icon: 'error' });
       }
     } finally {
       setReplying(false);

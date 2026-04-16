@@ -15,6 +15,6 @@ export class ChatController {
     @CurrentUser() user: DecodedIdToken,
     @Body() dto: SendMessageDto,
   ): Promise<{ reply: string }> {
-    return this.chatService.processMessage(user.uid, dto.message);
+    return this.chatService.processMessage(user.uid, dto.message, dto.conversationId);
   }
 }

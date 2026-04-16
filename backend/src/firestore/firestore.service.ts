@@ -7,6 +7,7 @@ export interface NewMessage {
   content: string;
   role: MessageRole;
   userId: string;
+  conversationId: string;
 }
 
 @Injectable()
@@ -16,12 +17,17 @@ export class FirestoreService {
   constructor(private readonly firebaseService: FirebaseService) {}
 
   async addMessage(message: NewMessage): Promise<void> {
-    const { content, role, userId } = message;
+    const { content, role, userId, conversationId } = message;
+    
+    // 1. Reference to the specific conversation messages
     const messagesRef = this.firebaseService.firestore
       .collection('chats')
       .doc(userId)
+      .collection('conversations')
+      .doc(conversationId)
       .collection('messages');
 
+    // 2. Add the message
     await messagesRef.add({
       content,
       role,
@@ -29,6 +35,18 @@ export class FirestoreService {
       createdAt: admin.firestore.Timestamp.now(),
     });
 
-    this.logger.debug(`Message saved [${role}] for user ${userId}`);
+    // 3. Update conversation metadata (last update and title if first message)
+    // For titles, we can do it on the frontend or here. For now, just touch updatedAt.
+    const conversationRef = this.firebaseService.firestore
+      .collection('chats')
+      .doc(userId)
+      .collection('conversations')
+      .doc(conversationId);
+
+    await conversationRef.set({
+      updatedAt: admin.firestore.Timestamp.now(),
+    }, { merge: true });
+
+    this.logger.debug(`Message saved [${role}] in conv ${conversationId} for user ${userId}`);
   }
 }

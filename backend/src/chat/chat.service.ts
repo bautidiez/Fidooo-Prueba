@@ -13,8 +13,8 @@ export class ChatService {
     private readonly firestoreService: FirestoreService,
   ) {}
 
-  async processMessage(userId: string, message: string): Promise<{ reply: string }> {
-    this.logger.debug(`Procesando mensaje de usuario: ${userId}`);
+  async processMessage(userId: string, message: string, conversationId: string): Promise<{ reply: string }> {
+    this.logger.debug(`Procesando mensaje en conv: ${conversationId} de usuario: ${userId}`);
     let reply: string | null = null;
     let errorLog = '';
 
@@ -33,6 +33,7 @@ export class ChatService {
         userId,
         content: reply,
         role: 'assistant',
+        conversationId,
       });
     } catch (dbError: any) {
       this.logger.error(`Error al guardar en Firestore: ${dbError.message}`, dbError);

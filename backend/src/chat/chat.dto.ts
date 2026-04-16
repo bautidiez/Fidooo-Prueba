@@ -5,4 +5,8 @@ export class SendMessageDto {
   @IsNotEmpty()
   @MaxLength(2000)
   message!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  conversationId!: string;
 }
