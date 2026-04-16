@@ -3,6 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: 'primary' | 'ghost' | 'danger';
+  size?: 'normal' | 'small';
   isLoading?: boolean;
   fullWidth?: boolean;
 }
@@ -10,6 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({
   children,
   variant = 'primary',
+  size = 'normal',
   isLoading = false,
   fullWidth = false,
   disabled,
@@ -17,7 +19,12 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    'relative inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-2 md:py-3 text-sm font-bold tracking-wide transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:scale-[1.02] overflow-hidden group cursor-pointer';
+    'relative inline-flex items-center justify-center gap-2 rounded-2xl px-6 font-bold tracking-wide transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:scale-[1.02] overflow-hidden group cursor-pointer';
+
+  const sizes = {
+    normal: 'py-2 md:py-3 text-sm',
+    small: 'py-1.5 text-xs',
+  };
 
   const variants = {
     primary:
@@ -31,7 +38,7 @@ export function Button({
   return (
     <button
       disabled={disabled || isLoading}
-      className={`${base} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={`${base} ${sizes[size]} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
       {...props}
     >
       {/* Shine effect for primary */}

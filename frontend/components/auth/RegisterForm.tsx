@@ -23,6 +23,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
     letter: /[a-zA-Z]/.test(password),
+    number: /[0-9]/.test(password),
   };
 
   const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
@@ -102,6 +103,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
               <div className={`size-1.5 rounded-full transition-colors ${passwordRequirements.letter ? 'bg-green-500' : 'bg-red-500/50'}`} />
               <p className={`text-[10px] ${passwordRequirements.letter ? 'text-green-400' : 'text-white/30'}`}>
                 Al menos una letra
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`size-1.5 rounded-full transition-colors ${passwordRequirements.number ? 'bg-green-500' : 'bg-red-500/50'}`} />
+              <p className={`text-[10px] ${passwordRequirements.number ? 'text-green-400' : 'text-white/30'}`}>
+                Al menos un número
               </p>
             </div>
           </div>

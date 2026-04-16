@@ -15,15 +15,31 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
+  // Timer logic for resend
+  const isResendDisabled = countdown > 0;
+
+  async function handleSendEmail(isResend: boolean = false): Promise<void> {
     setError(null);
     setIsLoading(true);
 
     try {
       await resetPassword(email);
       setSuccess(true);
+      setCountdown(30);
+      
+      // Start countdown
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
@@ -33,6 +49,11 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
+    e.preventDefault();
+    await handleSendEmail();
   }
 
   if (success) {
@@ -49,13 +70,28 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
             Revisá tu bandeja de entrada para restablecer tu contraseña.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onSwitchToLogin}
-          className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors cursor-pointer"
-        >
-          Volver al inicio de sesión
-        </button>
+
+        <div className="flex flex-col gap-2 w-full mt-2">
+          <Button 
+            type="button" 
+            variant="ghost" 
+            fullWidth 
+            disabled={isResendDisabled}
+            onClick={() => handleSendEmail(true)}
+            size="small"
+            className="text-xs"
+          >
+            {isResendDisabled ? `Reenviar en ${countdown}s` : '¿No llegó? Reenviar email'}
+          </Button>
+          
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors cursor-pointer"
+          >
+            Volver al inicio de sesión
+          </button>
+        </div>
       </div>
     );
   }
