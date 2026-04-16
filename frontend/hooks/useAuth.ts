@@ -17,6 +17,7 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
+          emailVerified: firebaseUser.emailVerified,
         };
         setUser(user);
       } else {

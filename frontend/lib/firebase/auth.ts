@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
   GoogleAuthProvider,
   signInWithPopup,
   type UserCredential,
@@ -50,3 +51,5 @@ export async function signInWithGoogle(): Promise<UserCredential> {
   const provider = new GoogleAuthProvider();
   return signInWithPopup(auth, provider);
 }
+
+export { sendEmailVerification };

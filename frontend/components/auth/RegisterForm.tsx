@@ -18,6 +18,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const passwordRequirements = {
     length: password.length >= 8,
@@ -27,6 +29,27 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   };
 
   const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
+
+  async function handleSendVerification(user: any) {
+    try {
+      const { sendEmailVerification } = await import('@/lib/firebase/auth');
+      await sendEmailVerification(user);
+      setVerificationSent(true);
+      setCountdown(60);
+      
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('Error sending verification:', err);
+    }
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -46,18 +69,70 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
     try {
       const credential = await signUp(email, password);
-      const token = await credential.user.getIdToken();
-      document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
-      router.push('/chat');
+      // Send verification email
+      await handleSendVerification(credential.user);
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
       } else {
         setError('Ocurrió un error inesperado.');
       }
-    } finally {
       setIsLoading(false);
     }
+  }
+
+  if (verificationSent) {
+    return (
+      <div className="flex flex-col items-center gap-6 py-4 text-center">
+        <div className="relative">
+          <div className="flex size-20 items-center justify-center rounded-[2rem] bg-emerald-500/20 ring-1 ring-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-pulse">
+            <svg className="size-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div className="absolute -right-1 -top-1 size-5 rounded-full bg-emerald-500 border-4 border-[#1c1c1c] flex items-center justify-center">
+            <svg className="size-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-white tracking-tight">¡Casi listo, {email.split('@')[0]}!</h2>
+          <p className="text-sm text-white/50 leading-relaxed max-w-xs mx-auto">
+            Te enviamos un mensaje de activación a <span className="text-emerald-400 font-medium">{email}</span>.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 w-full">
+          <div className="rounded-xl border border-white/5 bg-white/5 p-4 text-xs text-white/40 leading-relaxed italic">
+            "Revisá tu carpeta de SPAM si no lo ves en unos minutos."
+          </div>
+
+          <Button 
+            type="button" 
+            variant="ghost" 
+            fullWidth 
+            disabled={countdown > 0}
+            size="small"
+            onClick={async () => {
+              const { auth } = await import('@/lib/firebase/auth');
+              if (auth.currentUser) await handleSendVerification(auth.currentUser);
+            }}
+          >
+            {countdown > 0 ? `Reenviar en ${countdown}s` : '¿No llegó? Reenviar email'}
+          </Button>
+
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors cursor-pointer"
+          >
+            Volver al inicio de sesión
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

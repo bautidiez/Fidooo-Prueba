@@ -33,6 +33,44 @@ export default function ChatPage() {
     return null;
   }
 
+  // Block access if email is not verified
+  if (!user.emailVerified) {
+    return (
+      <div className="flex h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-20 relative overflow-hidden">
+        <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
+        
+        <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
+            <div className="mb-8 flex size-24 items-center justify-center rounded-[2.5rem] bg-amber-500/20 ring-1 ring-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.15)]">
+                <svg className="size-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            
+            <h2 className="mb-3 text-2xl font-bold text-white tracking-tight">Acceso Restringido</h2>
+            <p className="mb-8 text-sm text-white/50 leading-relaxed max-w-xs">
+              Tu cuenta de <span className="text-[#1ebbf4] font-semibold">{user.email}</span> aún no está verificada. Por favor, activá el email que te enviamos para habilitar el chat.
+            </p>
+
+            <div className="flex w-full flex-col gap-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full rounded-2xl bg-white/5 border border-white/10 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 cursor-pointer"
+              >
+                Ya verifiqué, entrar ahora
+              </button>
+              
+              <button
+                onClick={handleSignOut}
+                className="w-full rounded-2xl px-6 py-3 text-sm font-bold text-white/40 transition-all hover:text-white cursor-pointer"
+              >
+                Volver al Login / Salir
+              </button>
+            </div>
+        </div>
+      </div>
+    );
+  }
+
   const displayName = user.displayName ?? user.email?.split('@')[0] ?? 'Usuario';
   const initials = displayName.slice(0, 2).toUpperCase();
   const avatarImage = user.photoURL;
@@ -104,7 +142,7 @@ export default function ChatPage() {
                  });
                }
             }}
-            className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-white/70 transition-all hover:bg-white/10 hover:text-[#1ebbf4]"
+            className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-white/70 transition-all hover:bg-white/10 hover:text-[#1ebbf4] cursor-pointer"
           >
             <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
