@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { FirebaseError } from 'firebase/app';
-import { resetPassword, getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import { resetPassword, getFirebaseErrorMessage, checkEmailExists } from '@/lib/firebase/auth';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -25,6 +25,15 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
     setIsLoading(true);
 
     try {
+      // Verificamos si el email existe antes de intentar resetear
+      const exists = await checkEmailExists(email);
+      
+      if (!exists) {
+        setError('Ese email no está registrado por favor');
+        setIsLoading(false);
+        return;
+      }
+
       await resetPassword(email);
       setSuccess(true);
       setCountdown(30);

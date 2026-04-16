@@ -47,6 +47,26 @@ export async function resetPassword(email: string): Promise<void> {
   return sendPasswordResetEmail(auth, email);
 }
 
+export async function checkEmailExists(email: string): Promise<boolean> {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://fidooo-prueba.vercel.app/api';
+  
+  try {
+    const response = await fetch(`${backendUrl}/auth/check-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) return true; // Fail safe: let Firebase handle it if backend fails
+
+    const data = await response.json();
+    return data.registered === true;
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return true; // Fail safe
+  }
+}
+
 export async function signInWithGoogle(): Promise<UserCredential> {
   const provider = new GoogleAuthProvider();
   return signInWithPopup(auth, provider);
