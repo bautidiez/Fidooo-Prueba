@@ -1,63 +1,65 @@
-# FibooChat — Aplicación Fullstack
+# 🌀 Fiboo AI Chat — Smart Conversations
 
-Chat en tiempo real potenciado por **OpenAI ChatGPT**, **Firebase**, **Next.js 14** y **NestJS**.
+**Fiboo AI Chat** es una plataforma de inteligencia artificial diseñada para ofrecer una experiencia de conversación fluida, rápida y futurista. El sistema está construido con una arquitectura escalable de microservicios, utilizando lo último en tecnología de modelos de lenguaje (LLM).
 
-## 🏗️ Arquitectura
+![Fiboo Banner](https://raw.githubusercontent.com/bautidiez/Fidooo-Prueba/main/public/assets/logo.png)
 
-- `/frontend`: App de Next.js. Maneja la UI, la autenticación directa con Firebase Client SDK, y se suscribe a los mensajes de Firestore en tiempo real usando un hook de Zustand (`useRealtimeMessages` + `useChatStore`).
-- `/backend`: App de NestJS. Actúa como capa de abstracción hacia ChatGPT de OpenAI. Protegido por el Firebase Admin SDK para verificar los tokens. Genera las respuestas y las escribe directamente a la base de Firestore del usuario.
+## 🚀 Características Principales
 
-## 🚀 Pre-requisitos & Configuración Inicial
+*   **⚡ Motor de IA con Groq**: Integración profunda con **Llama 3.3 70B** para respuestas instantáneas con latencia mínima.
+*   **📂 Historial de Conversaciones**: Sistema de sesiones persistentes que permite navegar entre chats pasados y crear nuevas salas instantáneamente.
+*   **📑 Soporte Markdown Completo**: Renderizado profesional de código, tablas, negritas, listas y más, para una lectura técnica óptima.
+*   **💬 Mensajería en Tiempo Real**: Sincronización inmediata de mensajes mediante Firebase Firestore.
+*   **🛡️ Autenticación Segura**: Sistema robusto basado en Firebase Auth con verificación de correo obligatoria.
+*   **🎨 Interfaz de Vanguardia**: Diseño "Glassmorphism" con auroras dinámicas, animaciones fluidas y modo oscuro nativo.
 
-El proyecto está diseñado pensando en escalabilidad pero también para arrancar de forma 100% gratuita usando la capa gratuita de Firebase (Plan Spark) y el MOCK mode si decides probar sin agregar saldo en OpenAI.
+## 🛠️ Stack Tecnológico
 
-### 1. Configurar Firebase (Base de Datos & Auth)
+### Frontend (User Interface)
+- **Framework**: [Next.js 14+](https://nextjs.org/) (App Router)
+- **Lenguaje**: TypeScript
+- **Estilos**: Tailwind CSS + Custom Animations
+- **Estado**: Zustand
+- **Markdown**: React-Markdown + Remark-GFM
 
-El Backend y el Frontend comparten el mismo proyecto de Firebase. 
-1. Entrar a la [Consola de Firebase](https://console.firebase.google.com/) y crear un proyecto (completamente gratis).
-2. Entrar a **Authentication**, click en "Comenzar", e ir a la sección "Sign In Method". Ahí activar el proveedor **Correo electrónico y contraseña** (dejando la opción "Vínculo al correo electrónico" deshabilitada). Guardar.
-3. Entrar a **Firestore Database**, crear base de datos en modo "Producción". Configura las reglas de Firebase copiando lo siguiente para que sea seguro:
-   ```js
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /chats/{userId}/messages/{messageId} {
-         allow read, write: if request.auth != null && request.auth.uid == userId;
-       }
-     }
-   }
-   ```
-4. **Para el Frontend (`.env.local`)**: Ve a la tuerca "Configuración del proyecto" en Firebase → "Agregar app Web". Copia las variables `apiKey`, `projectId`, etc. a tu archivo `frontend/.env.local`. *(Usa el `frontend/.env.example` de guía)*.
-5. **Para el Backend (`.env`)**: Ve a "Configuración del proyecto" → "Cuentas de servicio" → generar una nueva clave privada. Esto descarga un JSON. Copia las propiedades `projectId`, `private_key` (entera, con los `\n`) y el `client_email` a tu `backend/.env`. *(Usa el `backend/.env.example` de guía)*.
+### Backend (Logic API)
+- **Framework**: [NestJS](https://nestjs.com/)
+- **Infraestructura**: Firebase Admin SDK
+- **Motor AI**: Groq Cloud API API (llama-3.3-70b-versatile)
 
-### 2. Configurar OpenAI (Opcional - Mock Mode Activo)
+### Infraestructura
+- **Base de Datos**: Google Cloud Firestore (Real-time DB)
+- **Auth**: Firebase Authentication
+- **Deploy**: Vercel
 
-- Ve a tu app `backend/`. Abre y renombra `.env.example` a `.env`. 
-- Completalo con las claves de Firebase mencionadas arriba.
-- Si dejas la variable `OPENAI_API_KEY=` vacía, el sistema arranca automáticamente en modo de pruebas respondiéndote de forma inteligente pero simulada. ¡Perfecto para no gastar una moneda mientras se desarrolla/prueba!
+## ⚙️ Configuración del Proyecto
+
+### Variables de Entorno (.env)
+
+| Variable | Descripción |
+| :--- | :--- |
+| `GROQ_API_KEY` | Clave de acceso a la API de Groq |
+| `PROJECT_ID` | Tu ID de proyecto de Firebase |
+| `CLIENT_EMAIL` | Email de la Service Account de Firebase |
+| `PRIVATE_KEY` | Llave privada para Firebase Admin (Sanitizada) |
+
+## 📦 Instalación y Uso
+
+1.  **Clonar el repositorio**:
+    ```bash
+    git clone https://github.com/bautidiez/Fidooo-Prueba.git
+    ```
+2.  **Instalar dependencias**:
+    ```bash
+    # En la carpeta /frontend
+    npm install
+    # En la carpeta /backend
+    npm install
+    ```
+3.  **Correr en desarrollo**:
+    ```bash
+    npm run dev
+    ```
 
 ---
-
-## 🏃‍♂️ Levantar el proyecto
-
-### Iniciar Backend
-
-```bash
-cd backend
-npm install
-npm run start:dev
-# Corre en http://localhost:3001
-```
-
-### Iniciar Frontend
-
-Abre otra terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-# Corre en http://localhost:3000
-```
-
-Entra a `http://localhost:3000`, créate una cuenta y comienza a chatear.
+Desarrollado con ❤️ por **Fidooo Engineering**.
