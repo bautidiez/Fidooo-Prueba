@@ -39,15 +39,6 @@ export class GeminiService implements OnModuleInit {
   }
 
   async generateReply(userMessage: string): Promise<string> {
-    const apiKey = this.configService.get('gemini', { infer: true }).apiKey;
-    
-    // Verificación defensiva del formato de la clave
-    if (apiKey && !apiKey.startsWith('AIza')) {
-      throw new InternalServerErrorException(
-        'La GEMINI_API_KEY configurada en Vercel es inválida. Debe empezar con "AIza". Por favor, generá una nueva en aistudio.google.com'
-      );
-    }
-
     if (this.isMockMode || !this.model) {
       return '¡Hola! Soy FibooChat. El sistema está funcionando pero el motor de IA no está configurado correctamente.';
     }
