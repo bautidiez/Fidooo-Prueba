@@ -44,7 +44,10 @@ export const configuration = (): AppConfig => ({
   },
   firebase: {
     projectId: process.env.PROJECT_ID!,
-    privateKey: (process.env.PRIVATE_KEY ?? '').replace(/\\n/g, '\n'),
+    privateKey: (process.env.PRIVATE_KEY ?? '')
+      .trim()
+      .replace(/^"+|"+$/g, '') // Remove leading/trailing quotes
+      .replace(/\\n/g, '\n'),
     clientEmail: process.env.CLIENT_EMAIL!,
   },
 });
