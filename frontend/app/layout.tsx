@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'FidoooChat — Fidooo Engineering AI',
   description:
     'Conversaciones inteligentes potenciadas por ChatGPT, con autenticación segura y mensajería en tiempo real. By Fidooo Engineering.',
+  icons: {
+    icon: '/assets/assistant-logo.png',
+  },
   other: {
     google: 'notranslate',
   },
