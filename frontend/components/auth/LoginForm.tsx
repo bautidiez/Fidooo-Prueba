@@ -118,7 +118,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
         <button
           type="button"
           onClick={onSwitchToReset}
-          className="text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer"
         >
           ¿Olvidaste tu contraseña?
         </button>
@@ -127,7 +127,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
           <button
             type="button"
             onClick={onSwitchToRegister}
-            className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+            className="text-violet-400 hover:text-violet-300 font-medium transition-colors cursor-pointer"
           >
             Registrate
           </button>

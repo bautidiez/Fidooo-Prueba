@@ -52,7 +52,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors"
+          className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors cursor-pointer"
         >
           Volver al inicio de sesión
         </button>
@@ -90,7 +90,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
       <button
         type="button"
         onClick={onSwitchToLogin}
-        className="text-center text-xs text-white/40 hover:text-white/70 transition-colors"
+        className="text-center text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer"
       >
         ← Volver al inicio de sesión
       </button>
