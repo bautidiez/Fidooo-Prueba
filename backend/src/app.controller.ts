@@ -14,8 +14,10 @@ export class AppController {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'production',
       config: {
-        projectId: process.env.PROJECT_ID ? 'Configured ✅' : 'Missing ❌',
-        openai: process.env.OPENAI_API_KEY ? 'Configured ✅' : 'Missing ❌',
+        firebaseProjectId: process.env.PROJECT_ID ? 'Configured ✅' : 'Missing ❌',
+        groqActive: process.env.GROQ_API_KEY ? 'Yes ✅' : 'No ❌',
+        geminiActive: process.env.GEMINI_API_KEY ? 'Yes ✅' : 'No ❌',
+        openaiActive: process.env.OPENAI_API_KEY ? 'Yes ✅' : 'No ❌',
       }
     };
   }
