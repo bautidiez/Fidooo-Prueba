@@ -82,12 +82,9 @@ export default function ChatPage() {
   return (
     <div className="flex h-dvh bg-[#1c1c1c] overflow-hidden">
       {/* Sidebar Overlay for Mobile */}
-      {!isSidebarOpen && (
-        <div className="lg:hidden" />
-      )}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden pointer-events-auto cursor-pointer"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -95,7 +92,7 @@ export default function ChatPage() {
       {/* Sidebar */}
       <Sidebar />
 
-      <div className="flex flex-1 flex-col relative overflow-hidden">
+      <div className={`flex flex-1 flex-col relative overflow-hidden transition-all duration-500 ease-in-out`}>
         {/* Background Aurora */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
            <div className="aurora-bg bg-[#1ebbf4] w-[100vw] h-[100vw] -top-[50vw] -left-[20vw]"></div>
@@ -103,13 +100,14 @@ export default function ChatPage() {
 
         {/* Header */}
         <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-white/5 px-4 py-3 backdrop-blur-xl md:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-500">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {!isSidebarOpen && (
               <button 
                 onClick={() => setSidebarOpen(true)}
-                className="flex items-center gap-3 group transition-all"
+                className="flex items-center gap-3 group transition-all cursor-pointer p-1.5 rounded-xl hover:bg-white/5"
+                title="Abrir menú"
               >
-                <div className="relative size-8 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)] transition-transform group-hover:scale-110">
+                <div className="relative size-10 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)] transition-transform group-hover:scale-110">
                   <Image 
                     src="/assets/logo.png" 
                     alt="Fidooo Logo" 
@@ -119,18 +117,20 @@ export default function ChatPage() {
                   />
                 </div>
                 <div className="flex flex-col justify-center border-l border-white/10 pl-3 text-left">
-                  <h1 className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#1ebbf4] transition-colors">Abrir Menú</h1>
+                  <svg className="size-6 text-white group-hover:text-[#1ebbf4] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                  </svg>
                 </div>
               </button>
             )}
             
             {isSidebarOpen && (
-              <div className="flex items-center gap-2">
-                <div className="relative size-8 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)]">
+              <div className="flex items-center gap-3">
+                <div className="relative size-12 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)]">
                    <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" priority />
                 </div>
-                <div className="hidden xs:flex flex-col justify-center border-l border-white/10 pl-3">
-                  <h1 className="text-xs font-black uppercase tracking-[0.2em] text-white">Fidooo AI</h1>
+                <div className="hidden xs:flex flex-col justify-center border-l border-white/10 pl-4">
+                  <h1 className="text-sm font-black uppercase tracking-[0.2em] text-white">Fidooo AI</h1>
                 </div>
               </div>
             )}
