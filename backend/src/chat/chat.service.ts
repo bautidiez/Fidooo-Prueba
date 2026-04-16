@@ -23,24 +23,8 @@ export class ChatService {
       reply = await this.groqService.generateReply(message);
       this.logger.log('Respuesta generada con Groq');
     } catch (e: any) {
-      this.logger.warn(`Falla en Groq: ${e.message}`);
-      errorLog += `Groq: ${e.message}. `;
-    }
-
-    // 2. Fallback a Gemini si Groq falló o no tiene clave
-    if (!reply) {
-      try {
-        reply = await this.geminiService.generateReply(message);
-        this.logger.log('Respuesta generada con Gemini');
-      } catch (e: any) {
-        this.logger.warn(`Falla en Gemini: ${e.message}`);
-        errorLog += `Gemini: ${e.message}. `;
-      }
-    }
-
-    // 3. Fallo total
-    if (!reply) {
-      throw new Error(`No se pudo conectar con ninguna IA (Groq/Gemini). Detalles: ${errorLog}`);
+      this.logger.error(`Falla crítica en Groq: ${e.message}`);
+      throw new Error(`Error en Groq (IA): ${e.message}. Verificá tu cuota en console.groq.com`);
     }
 
     // Guardar respuesta del asistente en Firestore
