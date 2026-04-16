@@ -99,7 +99,7 @@ export default function ChatPage() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-white/5 px-4 py-3 backdrop-blur-xl md:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-500">
+        <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-white/5 px-4 py-2 backdrop-blur-xl md:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-500">
           <div className="flex items-center gap-4">
             {!isSidebarOpen && (
               <button 
