@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 export function Sidebar() {
   const { user } = useAuth();
-  const { activeConversationId, setActiveConversationId } = useChatStore();
+  const { activeConversationId, setActiveConversationId, isSidebarOpen, setSidebarOpen } = useChatStore();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -48,13 +48,41 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-white/5 bg-[#141414] backdrop-blur-xl">
-      {/* Sidebar Header */}
-      <div className="p-4">
+    <aside 
+      className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/5 bg-[#141414]/95 backdrop-blur-2xl transition-transform duration-500 ease-in-out lg:relative lg:translate-x-0 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
+      {/* Sidebar Header with Close Arrow */}
+      <div className="flex items-center justify-between p-4">
+        <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+          Fiboo History
+        </h3>
+        <button 
+          onClick={() => setSidebarOpen(false)}
+          className="lg:hidden p-2 text-white/40 hover:text-white transition-all active:scale-90"
+        >
+          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
+        {/* Desktop Close Arrow */}
+        <button 
+          onClick={() => setSidebarOpen(false)}
+          className="hidden lg:block p-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-white hover:border-[#1ebbf4]/30 transition-all active:scale-90"
+          title="Cerrar menú"
+        >
+          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="px-4 mb-4">
         <button
           onClick={handleCreateNew}
           disabled={isCreating}
-          className="flex w-full items-center gap-3 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#1ebbf4]/50 shadow-lg active:scale-95 disabled:opacity-50"
+          className="flex w-full items-center gap-3 rounded-xl bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/10 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#1ebbf4]/50 shadow-lg active:scale-95 disabled:opacity-50"
         >
           <svg className="size-5 text-[#1ebbf4]" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

@@ -20,8 +20,10 @@ export interface ChatState {
   messages: Message[];
   isReplying: boolean;
   activeConversationId: string | null;
+  isSidebarOpen: boolean;
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
   setReplying: (isReplying: boolean) => void;
   setActiveConversationId: (id: string | null) => void;
+  setSidebarOpen: (isOpen: boolean) => void;
 }
