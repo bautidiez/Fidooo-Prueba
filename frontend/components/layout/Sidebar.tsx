@@ -56,7 +56,7 @@ export function Sidebar() {
       {/* Sidebar Header with Close Arrow */}
       <div className="flex items-center justify-between p-4">
         <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-          Fiboo History
+          Historial de Chats
         </h3>
         <button 
           onClick={() => setSidebarOpen(false)}
@@ -130,7 +130,7 @@ export function Sidebar() {
            <div className="relative size-6">
               <Image src="/assets/logo.png" alt="Fidooo" fill className="object-contain grayscale" />
            </div>
-           <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Fidooo Engine v2</span>
+           <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Fidooo Engineering</span>
         </div>
       </div>
     </aside>

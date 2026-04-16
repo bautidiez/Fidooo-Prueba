@@ -104,10 +104,15 @@ export default function ChatPage() {
             {!isSidebarOpen && (
               <button 
                 onClick={() => setSidebarOpen(true)}
-                className="flex items-center gap-3 group transition-all cursor-pointer p-1.5 rounded-xl hover:bg-white/5"
+                className="flex items-center gap-4 group transition-all cursor-pointer p-1.5 rounded-xl hover:bg-white/5"
                 title="Abrir menú"
               >
-                <div className="relative size-10 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)] transition-transform group-hover:scale-110">
+                <div className="flex flex-col justify-center text-left">
+                  <svg className="size-6 text-white group-hover:text-[#1ebbf4] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                  </svg>
+                </div>
+                <div className="relative size-14 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)] transition-transform group-hover:scale-110">
                   <Image 
                     src="/assets/logo.png" 
                     alt="Fidooo Logo" 
@@ -116,21 +121,16 @@ export default function ChatPage() {
                     priority
                   />
                 </div>
-                <div className="flex flex-col justify-center border-l border-white/10 pl-3 text-left">
-                  <svg className="size-6 text-white group-hover:text-[#1ebbf4] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                  </svg>
-                </div>
               </button>
             )}
             
             {isSidebarOpen && (
-              <div className="flex items-center gap-3">
-                <div className="relative size-12 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)]">
-                   <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" priority />
+              <div className="flex items-center gap-4">
+                <div className="hidden xs:flex flex-col justify-center border-l border-white/10 pl-4 order-2">
+                  <h1 className="text-sm font-black uppercase tracking-[0.2em] text-white">Fidooo Engineering</h1>
                 </div>
-                <div className="hidden xs:flex flex-col justify-center border-l border-white/10 pl-4">
-                  <h1 className="text-sm font-black uppercase tracking-[0.2em] text-white">Fidooo AI</h1>
+                <div className="relative size-14 shrink-0 drop-shadow-[0_0_15px_rgba(30,187,244,0.4)] order-1">
+                   <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" priority />
                 </div>
               </div>
             )}
