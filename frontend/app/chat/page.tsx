@@ -146,11 +146,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
-      {/* Chat area */}
-      <div className="relative z-10 flex-1 overflow-hidden">
-        <ChatWindow userId={user.uid} />
-      </div>
-    </div>
-  );
-}

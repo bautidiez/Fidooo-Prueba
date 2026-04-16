@@ -47,6 +47,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       // 1. Create conversation if none exists
       if (!currentConvId) {
         currentConvId = await createConversation(userId, content.slice(0, 40));
+        if (!currentConvId) throw new Error('No se pudo crear la conversación en Firebase.');
         setActiveConversationId(currentConvId);
       }
 
@@ -58,6 +59,8 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       if (!idToken) throw new Error('Sesión expirada. Por favor, reingresá.');
 
       // 4. Call backend
+      if (!currentConvId) throw new Error('ID de conversación no encontrado.');
+
       const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
