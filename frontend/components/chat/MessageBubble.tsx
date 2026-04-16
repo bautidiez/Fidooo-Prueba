@@ -5,6 +5,7 @@ import type { Message } from '@/types/message.types';
 interface MessageBubbleProps {
   message: Message;
   userPhotoURL?: string | null;
+  userInitials?: string;
 }
 
 function formatTime(createdAt: Message['createdAt']): string {
@@ -13,7 +14,7 @@ function formatTime(createdAt: Message['createdAt']): string {
   return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 }
 
-export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
+export function MessageBubble({ message, userPhotoURL, userInitials }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
   return (
@@ -23,9 +24,9 @@ export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
     >
       {/* Avatar */}
       <div
-        className={`flex size-10 shrink-0 items-center justify-center rounded-2xl text-xs font-bold ring-1 overflow-hidden shadow-lg ${
+        className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold ring-1 overflow-hidden shadow-lg ${
           isUser
-            ? 'bg-white/10 ring-white/20 text-white backdrop-blur-md'
+            ? 'border border-[#1ebbf4]/30 shadow-[0_0_15px_rgba(30,187,244,0.2)]'
             : 'bg-gradient-to-br from-[#1ebbf4] to-[#c2ebfa] ring-[#1ebbf4]/50 shadow-[#1ebbf4]/30'
         }`}
       >
@@ -33,7 +34,9 @@ export function MessageBubble({ message, userPhotoURL }: MessageBubbleProps) {
           userPhotoURL ? (
             <img src={userPhotoURL} alt="User" className="size-full object-cover" />
           ) : (
-            'User'
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1ebbf4] to-[#84d6f6] text-sm font-bold text-[#0a0a0f]">
+              {userInitials || 'U'}
+            </div>
           )
         ) : (
           <img src="/assets/assistant-logo.png" alt="AI" className="size-full object-cover" />

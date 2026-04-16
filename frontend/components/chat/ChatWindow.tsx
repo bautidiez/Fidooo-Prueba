@@ -29,6 +29,8 @@ export function ChatWindow({ userId }: ChatWindowProps) {
   const { setReplying } = useChatStore();
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Usuario';
+  const userInitials = displayName.slice(0, 2).toUpperCase();
   const userPhotoURL = user?.photoURL;
 
   // Auto-scroll to bottom on new messages
@@ -131,6 +133,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
                 key={message.id} 
                 message={message} 
                 userPhotoURL={message.role === 'user' ? userPhotoURL : null}
+                userInitials={userInitials}
               />
             ))}
             {isReplying && <MessageBubbleSkeleton />}
