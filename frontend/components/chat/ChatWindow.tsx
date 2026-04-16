@@ -15,7 +15,13 @@ interface ChatWindowProps {
   userId: string;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001';
+let BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001';
+
+// Sanitización defensiva de la URL
+if (BACKEND_URL && !BACKEND_URL.startsWith('http')) {
+  BACKEND_URL = `https://${BACKEND_URL}`;
+}
+BACKEND_URL = BACKEND_URL.replace(/\/$/, ''); // Quitar barra final si existe
 
 export function ChatWindow({ userId }: ChatWindowProps) {
   const { user } = useAuth();
