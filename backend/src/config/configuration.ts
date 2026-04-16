@@ -4,9 +4,9 @@ export const validationSchema = Joi.object({
   PORT: Joi.number().default(3001),
   FRONTEND_URL: Joi.string().uri().required(),
   OPENAI_API_KEY: Joi.string().optional().allow(''),
-  FIREBASE_PROJECT_ID: Joi.string().required(),
-  FIREBASE_PRIVATE_KEY: Joi.string().required(),
-  FIREBASE_CLIENT_EMAIL: Joi.string().email().required(),
+  PROJECT_ID: Joi.string().required(),
+  PRIVATE_KEY: Joi.string().required(),
+  CLIENT_EMAIL: Joi.string().email().required(),
 });
 
 export interface AppConfig {
@@ -29,8 +29,8 @@ export const configuration = (): AppConfig => ({
     apiKey: process.env.OPENAI_API_KEY ?? '',
   },
   firebase: {
-    projectId: process.env.FIREBASE_PROJECT_ID!,
-    privateKey: (process.env.FIREBASE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n'),
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
+    projectId: process.env.PROJECT_ID!,
+    privateKey: (process.env.PRIVATE_KEY ?? '').replace(/\\n/g, '\n'),
+    clientEmail: process.env.CLIENT_EMAIL!,
   },
 });
