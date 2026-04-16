@@ -59,7 +59,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         } else {
           const text = await response.text();
           console.error('Backend returned non-JSON response:', text);
-          throw new Error('El servidor respondió con un error (HTML). Verificá el backend en Vercel.');
+          throw new Error(`Error HTML. URL llamada: ${BACKEND_URL}. Verificá fidooo-backend en Vercel.`);
         }
       }
 

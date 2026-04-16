@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { configuration, validationSchema } from './config/configuration';
 import { FirebaseModule } from './firebase/firebase.module';
 import { ChatModule } from './chat/chat.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -14,5 +15,6 @@ import { ChatModule } from './chat/chat.module';
     FirebaseModule,
     ChatModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
