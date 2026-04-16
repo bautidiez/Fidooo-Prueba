@@ -92,7 +92,9 @@ export default function ChatPage() {
       {/* Sidebar */}
       <Sidebar />
 
-      <div className={`flex flex-1 flex-col relative overflow-hidden transition-all duration-500 ease-in-out`}>
+      <div className={`flex flex-1 flex-col relative overflow-hidden transition-all duration-500 ease-in-out ${
+        isSidebarOpen ? 'lg:pl-72' : 'lg:pl-0'
+      }`}>
         {/* Background Aurora */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
            <div className="aurora-bg bg-[#1ebbf4] w-[100vw] h-[100vw] -top-[50vw] -left-[20vw]"></div>
