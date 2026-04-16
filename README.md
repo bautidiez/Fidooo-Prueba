@@ -4,7 +4,7 @@
 
 🚀 **Pruebalo en vivo:** [fidooo-prueba.vercel.app](https://fidooo-prueba.vercel.app/)
 
-![Fiboo Banner](https://raw.githubusercontent.com/bautidiez/Fidooo-Prueba/main/public/assets/logo.png)
+![Fiboo Banner](https://raw.githubusercontent.com/bautidiez/Fidooo-Prueba/main/frontend/public/assets/logo.png)
 
 ## 🚀 Características Principales
 
