@@ -52,8 +52,15 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       });
 
       if (!response.ok) {
-        const data = (await response.json()) as { message?: string };
-        throw new Error(data.message ?? 'Error en la respuesta de IA');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = (await response.json()) as { message?: string };
+          throw new Error(data.message ?? 'Error en la respuesta de IA');
+        } else {
+          const text = await response.text();
+          console.error('Backend returned non-JSON response:', text);
+          throw new Error('El servidor respondió con un error (HTML). Verificá el backend en Vercel.');
+        }
       }
 
       // Assistant message is handled by backend + Firestore listener

@@ -19,17 +19,25 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const passwordRequirements = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    letter: /[a-zA-Z]/.test(password),
+  };
+
+  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError(null);
 
-    if (password !== confirm) {
-      setError('Las contraseñas no coinciden.');
+    if (!isPasswordValid) {
+      setError('La contraseña no cumple con los requisitos.');
       return;
     }
 
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+    if (password !== confirm) {
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
@@ -63,16 +71,43 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         autoComplete="email"
         required
       />
-      <Input
-        id="register-password"
-        label="Contraseña"
-        type="password"
-        placeholder="Mínimo 6 caracteres"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        autoComplete="new-password"
-        required
-      />
+      <div>
+        <Input
+          id="register-password"
+          label="Contraseña"
+          type="password"
+          placeholder="Mínimo 8 caracteres"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
+          required
+        />
+        
+        {/* Real-time Validation UI */}
+        {password.length > 0 && (
+          <div className="mt-2 flex flex-col gap-1.5 px-1">
+            <div className="flex items-center gap-2">
+              <div className={`size-1.5 rounded-full transition-colors ${passwordRequirements.length ? 'bg-green-500' : 'bg-red-500/50'}`} />
+              <p className={`text-[10px] ${passwordRequirements.length ? 'text-green-400' : 'text-white/30'}`}>
+                Al menos 8 caracteres
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`size-1.5 rounded-full transition-colors ${passwordRequirements.uppercase ? 'bg-green-500' : 'bg-red-500/50'}`} />
+              <p className={`text-[10px] ${passwordRequirements.uppercase ? 'text-green-400' : 'text-white/30'}`}>
+                Al menos una mayúscula
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`size-1.5 rounded-full transition-colors ${passwordRequirements.letter ? 'bg-green-500' : 'bg-red-500/50'}`} />
+              <p className={`text-[10px] ${passwordRequirements.letter ? 'text-green-400' : 'text-white/30'}`}>
+                Al menos una letra
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       <Input
         id="register-confirm"
         label="Confirmar contraseña"
@@ -91,7 +126,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         </div>
       )}
 
-      <Button type="submit" fullWidth isLoading={isLoading}>
+      <Button type="submit" fullWidth isLoading={isLoading} disabled={!isPasswordValid}>
         Crear cuenta
       </Button>
       
