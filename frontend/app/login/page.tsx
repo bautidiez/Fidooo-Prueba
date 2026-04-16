@@ -24,14 +24,14 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-12 md:pt-20 overflow-hidden">
+    <main className="relative flex min-h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-4 md:pt-6 overflow-hidden">
       {/* Background Aurora */}
       <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
       <div className="aurora-bg bg-[#84d6f6] w-[60vw] h-[60vw] top-[20vw] right-[0vw]" style={{ animationDuration: '25s' }}></div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
-        <div className="mb-6 md:mb-10 flex flex-col items-center gap-4">
+        <div className="mb-2 md:mb-4 flex flex-col items-center gap-4">
           <div className="relative w-48 h-20 md:w-72 md:h-32 pointer-events-none drop-shadow-[0_0_20px_rgba(30,187,244,0.4)]">
             <Image 
               src="/assets/logo.png" 
