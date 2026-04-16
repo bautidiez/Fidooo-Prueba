@@ -24,15 +24,15 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-4 md:pt-6 overflow-hidden">
+    <main className="relative flex min-h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-4 md:pt-6 overflow-y-auto pb-8">
       {/* Background Aurora */}
       <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
       <div className="aurora-bg bg-[#84d6f6] w-[60vw] h-[60vw] top-[20vw] right-[0vw]" style={{ animationDuration: '25s' }}></div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
-        <div className="mb-2 md:mb-4 flex flex-col items-center gap-4">
-          <div className="relative w-48 h-20 md:w-72 md:h-32 pointer-events-none drop-shadow-[0_0_20px_rgba(30,187,244,0.4)]">
+        <div className="mb-2 flex flex-col items-center gap-2">
+          <div className="relative w-40 h-16 md:w-72 md:h-32 pointer-events-none drop-shadow-[0_0_20px_rgba(30,187,244,0.4)]">
             <Image 
               src="/assets/logo.png" 
               alt="Fidooo Engineering Logo" 
@@ -42,7 +42,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="text-center">
-            <p className="text-xs md:text-sm font-medium tracking-wide text-white/50">{subtitles[activeTab]}</p>
+            <p className="text-[10px] md:text-sm font-medium tracking-wide text-white/50">{subtitles[activeTab]}</p>
           </div>
         </div>
 
@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
           
           {/* Tab Title */}
-          <h2 className="mb-6 text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
+          <h2 className="mb-4 md:mb-6 text-lg md:text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
 
           {/* Forms */}
           {activeTab === 'login' && (
@@ -69,7 +69,7 @@ export default function LoginPage() {
           )}
         </div>
 
-        <p className="mt-8 text-center text-[10px] uppercase tracking-widest text-white/30 font-medium">
+        <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
           Powered by ChatGPT • Firebase • Fidooo Next.js
         </p>
       </div>
