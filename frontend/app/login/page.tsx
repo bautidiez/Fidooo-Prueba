@@ -47,7 +47,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-3xl border border-white/5 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden group">
+        <div className="rounded-3xl border border-white/5 bg-white/5 p-5 md:p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden group">
           {/* Subtle inner top glow */}
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
           

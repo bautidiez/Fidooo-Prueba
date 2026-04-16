@@ -17,7 +17,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    'relative inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold tracking-wide transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:scale-[1.02] overflow-hidden group cursor-pointer';
+    'relative inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-2 md:py-3 text-sm font-bold tracking-wide transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:scale-[1.02] overflow-hidden group cursor-pointer';
 
   const variants = {
     primary:

@@ -25,7 +25,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={id}
             className={`
-              w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm text-white
+              w-full rounded-xl border bg-white/5 px-4 py-2 text-sm text-white
               placeholder:text-white/30 backdrop-blur-sm
               transition-all duration-200 outline-none
               ${icon ? 'pl-10' : ''}
