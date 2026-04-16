@@ -260,7 +260,7 @@ export default function ResetPasswordPage() {
           <div className="size-10 border-4 border-white/20 border-t-[#1ebbf4] rounded-full animate-spin" />
         </div>
       }>
-        <ResetPasswordContent />
+        <AuthActionContent />
       </Suspense>
 
       <p className="mt-8 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
