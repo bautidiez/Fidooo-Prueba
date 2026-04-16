@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  
+  /* Gradiente Fidooo (Tomado del logo) */
+  --color-fidooo-primary: #1ebbf4;
+  --color-fidooo-secondary: #84d6f6;
+  --color-fidooo-tertiary: #c2ebfa;
+  --color-fidooo-bg: #1c1c1c;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 187, 244, 0.2);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 187, 244, 0.4);
+}
+
+/* Ensure full height on mobile */
+body {
+  min-height: 100dvh;
+  background-color: var(--color-fidooo-bg);
+}
+
+/* Aurora Animation */
+@keyframes aurora {
+  0% { transform: rotate(0deg) scale(1) translate(0%, 0%); }
+  33% { transform: rotate(120deg) scale(1.1) translate(10%, -10%); }
+  66% { transform: rotate(240deg) scale(0.9) translate(-10%, 10%); }
+  100% { transform: rotate(360deg) scale(1) translate(0%, 0%); }
+}
+
+.aurora-bg {
+  position: absolute;
+  filter: blur(140px);
+  opacity: 0.15;
+  animation: aurora 20s infinite linear;
+  border-radius: 50%;
+  pointer-events: none;
+}

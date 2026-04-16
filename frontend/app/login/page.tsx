@@ -1,0 +1,78 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { RegisterForm } from '@/components/auth/RegisterForm';
+import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
+
+type AuthTab = 'login' | 'register' | 'reset';
+
+export default function LoginPage() {
+  const [activeTab, setActiveTab] = useState<AuthTab>('login');
+
+  const titles: Record<AuthTab, string> = {
+    login: 'Bienvenido de vuelta',
+    register: 'Creá tu cuenta',
+    reset: 'Recuperá tu contraseña',
+  };
+
+  const subtitles: Record<AuthTab, string> = {
+    login: 'Iniciá sesión para conversar con IA',
+    register: 'Comenzá a chatear con IA en segundos',
+    reset: 'Te enviamos el link a tu email',
+  };
+
+  return (
+    <main className="relative flex min-h-dvh flex-col items-center justify-center bg-[#1c1c1c] px-4 py-12 overflow-hidden">
+      {/* Background Aurora */}
+      <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
+      <div className="aurora-bg bg-[#84d6f6] w-[60vw] h-[60vw] top-[20vw] right-[0vw]" style={{ animationDuration: '25s' }}></div>
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
+        <div className="mb-10 flex flex-col items-center gap-4">
+          <div className="relative w-72 h-32 pointer-events-none drop-shadow-[0_0_20px_rgba(30,187,244,0.4)]">
+            <Image 
+              src="/assets/logo.png" 
+              alt="Fidooo Engineering Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-medium tracking-wide text-white/50">{subtitles[activeTab]}</p>
+          </div>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-3xl border border-white/5 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden group">
+          {/* Subtle inner top glow */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+          
+          {/* Tab Title */}
+          <h2 className="mb-6 text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
+
+          {/* Forms */}
+          {activeTab === 'login' && (
+            <LoginForm
+              onSwitchToRegister={() => setActiveTab('register')}
+              onSwitchToReset={() => setActiveTab('reset')}
+            />
+          )}
+          {activeTab === 'register' && (
+            <RegisterForm onSwitchToLogin={() => setActiveTab('login')} />
+          )}
+          {activeTab === 'reset' && (
+            <ResetPasswordForm onSwitchToLogin={() => setActiveTab('login')} />
+          )}
+        </div>
+
+        <p className="mt-8 text-center text-[10px] uppercase tracking-widest text-white/30 font-medium">
+          Powered by ChatGPT • Firebase • Fidooo Next.js
+        </p>
+      </div>
+    </main>
+  );
+}
