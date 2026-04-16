@@ -15,27 +15,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    // In certain situations `httpAdapter` might not be available in the
-    // constructor method, thus we should resolve it here.
     const { httpAdapter } = this.httpAdapterHost;
-
     const ctx = host.switchToHttp();
 
-    const httpStatus =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const isHttpException = exception instanceof HttpException;
+    const httpStatus = isHttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const errorMessage = exception instanceof Error ? exception.message : 'Internal server error';
+    const errorMessage = isHttpException
+      ? (exception.getResponse() as any).message || exception.message
+      : 'Ha ocurrido un error interno en el servidor';
     
-    this.logger.error(`Exception thrown: ${errorMessage}`, exception instanceof Error ? exception.stack : '');
+    // Logueamos el error real internamente para debug
+    this.logger.error(
+      `Exception thrown: ${exception instanceof Error ? exception.message : 'Unknown'}`,
+      exception instanceof Error ? exception.stack : ''
+    );
 
     const responseBody = {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
       message: errorMessage,
-      details: exception instanceof HttpException ? exception.getResponse() : null,
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
