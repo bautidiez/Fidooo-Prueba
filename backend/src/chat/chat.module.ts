@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
-import { OpenAiModule } from '../openai/openai.module';
+import { AiModule } from '../ai/ai.module';
 import { FirestoreModule } from '../firestore/firestore.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
-  imports: [OpenAiModule, FirestoreModule, FirebaseModule],
+  imports: [AiModule, FirestoreModule, FirebaseModule],
   controllers: [ChatController],
   providers: [ChatService],
 })

@@ -4,6 +4,7 @@ export const validationSchema = Joi.object({
   PORT: Joi.number().default(3001),
   FRONTEND_URL: Joi.string().uri().required(),
   OPENAI_API_KEY: Joi.string().optional().allow(''),
+  GEMINI_API_KEY: Joi.string().optional().allow(''), // Added Gemini support
   PROJECT_ID: Joi.string().required(),
   PRIVATE_KEY: Joi.string().required(),
   CLIENT_EMAIL: Joi.string().email().required(),
@@ -13,6 +14,9 @@ export interface AppConfig {
   port: number;
   frontendUrl: string;
   openai: {
+    apiKey: string;
+  };
+  gemini: {
     apiKey: string;
   };
   firebase: {
@@ -27,6 +31,9 @@ export const configuration = (): AppConfig => ({
   frontendUrl: process.env.FRONTEND_URL!,
   openai: {
     apiKey: process.env.OPENAI_API_KEY ?? '',
+  },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY ?? '',
   },
   firebase: {
     projectId: process.env.PROJECT_ID!,
