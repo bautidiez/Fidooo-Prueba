@@ -51,19 +51,26 @@ export async function checkEmailExists(email: string): Promise<boolean> {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://fidooo-prueba.vercel.app/api';
   
   try {
+    console.log(`Checking email existence at: ${backendUrl}/auth/check-email`);
     const response = await fetch(`${backendUrl}/auth/check-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
 
-    if (!response.ok) return true; // Fail safe: let Firebase handle it if backend fails
+    console.log(`Backend response status: ${response.status}`);
+
+    if (!response.ok) {
+      console.warn('Backend verification failed or not found. Falling back to default behavior.');
+      return true; 
+    }
 
     const data = await response.json();
+    console.log('Backend verification result:', data);
     return data.registered === true;
   } catch (error) {
-    console.error('Error checking email:', error);
-    return true; // Fail safe
+    console.error('Error connecting to backend for email check:', error);
+    return true; 
   }
 }
 
