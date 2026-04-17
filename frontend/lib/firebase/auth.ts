@@ -108,17 +108,29 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
   // Forzamos selección de cuenta para evitar que use una sesión previa corrupta
   provider.setCustomParameters({ prompt: 'select_account' });
   
-  // Detección básica de móvil para decidir el flujo de Auth
+  // Detección de móvil o modo incógnito/restringido
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  console.log(`[Auth] Iniciando Google Login. Modo sugerido: ${isMobile ? 'REDIRECT' : 'POPUP'}`);
 
   if (isMobile) {
     // Marcamos que hay un redirect pendiente para que el hook useAuth sepa qué esperar
     sessionStorage.setItem('pendingGoogleRedirect', 'true');
-    // En móviles, redirigimos para evitar el bloqueo de popups
     return signInWithRedirect(auth, provider);
   } else {
-    // en escritorio, usamos el popup para no recargar la página del usuario
-    return signInWithPopup(auth, provider);
+    try {
+      // Intentamos popup en escritorio para mejor UX
+      return await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      // FALLBACK CRÍTICO: Si el popup es bloqueado por el navegador o por un CSP viejo en caché,
+      // reintentamos automáticamente usando Redirect, que no puede ser bloqueado por CSP.
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        console.warn('[Auth] Popup bloqueado o cerrado. Reintentando vía Redirect para asegurar el acceso...');
+        sessionStorage.setItem('pendingGoogleRedirect', 'true');
+        return signInWithRedirect(auth, provider);
+      }
+      throw error;
+    }
   }
 }
 
