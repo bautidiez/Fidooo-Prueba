@@ -31,9 +31,9 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google-analytics.com https://identitytoolkit.googleapis.com https://*.firebaseapp.com https://*.firebase.com https://*.google.com;",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google-analytics.com https://identitytoolkit.googleapis.com https://*.firebaseapp.com https://*.firebase.com https://*.google.com https://fidooo-prueba.vercel.app;",
               "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://*.groq.com;",
-              "frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://*.firebase.com https://*.google.com;",
+              "frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://*.firebase.com https://*.google.com https://fidooo-prueba.vercel.app;",
               "frame-ancestors 'self';",
               "img-src 'self' blob: data: https://lh3.googleusercontent.com https://*.firebaseapp.com https://*.google.com;",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'SAMEORIGIN'
           },
           {
             key: 'Referrer-Policy',
