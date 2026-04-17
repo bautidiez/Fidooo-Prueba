@@ -5,6 +5,13 @@ import { CurrentUser } from '../auth/auth.decorator';
 import { ChatService } from './chat.service';
 import { SendMessageDto } from './chat.dto';
 
+/**
+ * Controlador del módulo de Chat.
+ * 
+ * QUÉ: Define el endpoint /chat para recibir mensajes del usuario.
+ * POR QUÉ: Punto de entrada HTTP que requiere autenticación obligatoria.
+ * PROBLEMA QUE RESUELVE: Delega la lógica al ChatService tras validar el JWT del usuario.
+ */
 @Controller('chat')
 @UseGuards(AuthGuard)
 export class ChatController {
