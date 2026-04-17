@@ -125,34 +125,21 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
  */
 export function setSessionCookie(token: string): void {
   const isSecure = window.location.protocol === 'https:';
-  const isLocalhost = window.location.hostname === 'localhost';
   
   /**
-   * REGLA DE PERSISTENCIA PARA MÓVILES/IP:
-   * 1. Si estamos en HTTPS o localhost, usamos flags estrictas (SameSite=None si es cross-origin o Secure si es localhost).
-   * 2. Si estamos en una IP local (ej: 192.168.x.x) sobre HTTP (común en testing móvil),
-   *    NO podemos usar 'Secure' ni 'SameSite=None'. Debemos usar 'SameSite=Lax'.
+   * REGLA DE PERSISTENCIA ULTRA-COMPATIBLE:
+   * Usamos 'Lax' por defecto tanto en local como en producción. 
+   * 'None' a veces es bloqueado por navegadores móviles (Safari/Chrome iOS) 
+   * incluso en sitios de primer nivel por políticas de privacidad estrictas.
    */
-  // Aumentamos max-age a 7 días (604800 segundos) para mayor robustez
-  const cookieBase = `__session=${token}; path=/; max-age=604800; Priority=High`;
+  const cookieBase = `__session=${token}; path=/; max-age=604800; SameSite=Lax; Priority=High`;
+  const finalCookie = isSecure ? `${cookieBase}; Secure` : cookieBase;
   
-  if (isSecure || isLocalhost) {
-    // Modo producción o local con privilegio
-    document.cookie = `${cookieBase}; Secure; SameSite=None`;
-    console.log('[Auth] Sesión síncrona: Secure; SameSite=None');
-  } else {
-    // Modo testing móvil por IP (HTTP)
-    console.warn('[Auth] Detectada conexión HTTP por IP. Usando cookies Lax sin Secure para compatibilidad móvil.');
-    document.cookie = `${cookieBase}; SameSite=Lax`;
-  }
+  document.cookie = finalCookie;
 
-  // Verificación inmediata de persistencia
+  // Verificación para el desarrollador en el log
   const isSet = document.cookie.includes('__session=');
-  if (!isSet) {
-    console.error('[Auth] CRITICAL: El navegador rechazó la cookie de sesión. Verificá la configuración de privacidad o si estás en modo incógnito.');
-  } else {
-    console.log('[Auth] Cookie de sesión verificada y persistida.');
-  }
+  console.log(`[Auth] Cookie configurada en ${isSecure ? 'HTTPS' : 'HTTP'}. Estado: ${isSet ? 'ÉXITO' : 'FALLO'}`);
 }
 
 export { sendEmailVerification, getRedirectResult };
