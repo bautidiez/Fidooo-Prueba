@@ -64,6 +64,17 @@ export default function LoginPage() {
       .catch((err) => {
         clearTimeout(timeout);
         console.error('[LoginPage] Error en redirect de Google:', err);
+        
+        // Manejo específico del Error 400 (Redirect Mismatch)
+        if (err.code === 'auth/operation-not-allowed' || err.message?.includes('redirect_uri_mismatch')) {
+          Swal.fire({
+            title: 'Configuración Requerida',
+            html: `Para usar Google en móviles, debés autorizar este dominio en la consola de Google Cloud.<br><br><b>URL a autorizar:</b><br><code>https://${window.location.host}/__/auth/handler</code>`,
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+          });
+        }
+
         sessionStorage.removeItem('pendingGoogleRedirect');
         setIsProcessingRedirect(false);
       });
@@ -164,7 +175,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.15
+          Powered by ChatGPT • Firebase • Fidooo v1.16
         </p>
       </div>
     </main>

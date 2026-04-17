@@ -22,6 +22,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/__/auth/:path*',
+        destination: `https://fiboochat.firebaseapp.com/__/auth/:path*`,
+      },
+      {
+        source: '/__/firebase/:path*',
+        destination: `https://fiboochat.firebaseapp.com/__/firebase/:path*`,
+      },
+    ];
+  },
   async headers() {
     return [
       {
