@@ -26,6 +26,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <meta 
+          httpEquiv="Content-Security-Policy" 
+          content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com https://www.gstatic.com; frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com; object-src 'none';"
+        />
+      </head>
       <body 
         className="font-sans antialiased bg-[#1c1c1c] text-white overflow-hidden"
         suppressHydrationWarning
