@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
 import { signIn, getFirebaseErrorMessage, setSessionCookie } from '@/lib/firebase/auth';
+import Swal from 'sweetalert2';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -36,8 +37,24 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
       const token = await credential.user.getIdToken();
       // Sincronización robusta de sesión
       setSessionCookie(token);
+
+      // Verificación para diagnóstico en móviles
+      const isCookieSet = document.cookie.includes('__session=');
+      if (!isCookieSet) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error de Sesión',
+          text: 'Tu navegador rechazó la sesión. Intentá desactivar el modo incógnito o permitir cookies.',
+          background: '#1c1c1c',
+          color: '#fff',
+          confirmButtonColor: '#1ebbf4'
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Pequeño delay de seguridad para asegurar que el navegador escriba la cookie
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise(r => setTimeout(r, 200));
       window.location.href = '/chat';
     } catch (err) {
       if (err instanceof FirebaseError) {

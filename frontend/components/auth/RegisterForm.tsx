@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
 import { signUp, getFirebaseErrorMessage, setSessionCookie } from '@/lib/firebase/auth';
+import Swal from 'sweetalert2';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -241,8 +242,24 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
             const token = await credential.user.getIdToken();
             setSessionCookie(token);
+            
+            // Verificación para diagnóstico en móviles
+            const isCookieSet = document.cookie.includes('__session=');
+            if (!isCookieSet) {
+              await Swal.fire({
+                icon: 'error',
+                title: 'Error de Sesión',
+                text: 'Tu navegador rechazó la sesión tras la redirección de Google. Verificá los permisos de cookies.',
+                background: '#1c1c1c',
+                color: '#fff',
+                confirmButtonColor: '#1ebbf4'
+              });
+              setIsLoading(false);
+              return;
+            }
+
             // Pequeño delay de seguridad
-            await new Promise(r => setTimeout(r, 150));
+            await new Promise(r => setTimeout(r, 200));
             window.location.href = '/chat';
           } catch (err: any) {
             if (err instanceof FirebaseError) {

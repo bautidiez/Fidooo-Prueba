@@ -1,13 +1,20 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  
-  /* Gradiente Fidooo (Tomado del logo) */
-  --color-fidooo-primary: #1ebbf4;
-  --color-fidooo-secondary: #84d6f6;
-  --color-fidooo-tertiary: #c2ebfa;
-  --color-fidooo-bg: #1c1c1c;
+/* 
+  Variables de Tema (Tailwind CSS v4)
+  USO: Se definen en :root para evitar advertencias de "Unknown at rule @theme" en el IDE, 
+  pero se envuelven en @theme para que Tailwind las registre como tokens (ej: bg-fidooo-primary).
+*/
+@layer theme {
+  @theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    
+    /* Gradiente Fidooo (Tomado del logo) */
+    --color-fidooo-primary: #1ebbf4;
+    --color-fidooo-secondary: #84d6f6;
+    --color-fidooo-tertiary: #c2ebfa;
+    --color-fidooo-bg: #1c1c1c;
+  }
 }
 
 /* Smooth scroll */

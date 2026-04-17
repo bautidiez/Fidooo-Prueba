@@ -73,6 +73,8 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     const targetUrl = `${backendUrl}/auth/check-email`;
     console.log(`[Auth] Checking email existence at: ${targetUrl}`);
     
+    // Si backendUrl es localhost, y estamos en móvil, esto fallará. 
+    // Capturamos el error de red específicamente para avisar en consola.
     const response = await fetch(targetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -80,14 +82,18 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.error(`[Auth] Backend error: ${response.status} ${response.statusText}`);
+      console.warn(`[Auth] Backend responded with status: ${response.status}`);
       return true; 
     }
 
     const data = await response.json();
     return data.registered === true;
-  } catch (error) {
-    console.error('[Auth] Network error while checking email:', error);
+  } catch (error: any) {
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      console.error('[Auth] Network error: No se pudo conectar al backend. ¿Está bien configurada la IP en .env?', error);
+    } else {
+      console.error('[Auth] Error checking email:', error);
+    }
     return true; 
   }
 }
@@ -118,8 +124,35 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
  * POR QUÉ: Los navegadores móviles requieren Secure y SameSite=Lax para persistir sesiones tras redirecciones.
  */
 export function setSessionCookie(token: string): void {
-  // SameSite=None + Secure es la configuración más robusta para móviles tras redirecciones
-  document.cookie = `__session=${token}; path=/; max-age=3600; Secure; SameSite=None; Priority=High`;
+  const isSecure = window.location.protocol === 'https:';
+  const isLocalhost = window.location.hostname === 'localhost';
+  
+  /**
+   * REGLA DE PERSISTENCIA PARA MÓVILES/IP:
+   * 1. Si estamos en HTTPS o localhost, usamos flags estrictas (SameSite=None si es cross-origin o Secure si es localhost).
+   * 2. Si estamos en una IP local (ej: 192.168.x.x) sobre HTTP (común en testing móvil),
+   *    NO podemos usar 'Secure' ni 'SameSite=None'. Debemos usar 'SameSite=Lax'.
+   */
+  // Aumentamos max-age a 7 días (604800 segundos) para mayor robustez
+  const cookieBase = `__session=${token}; path=/; max-age=604800; Priority=High`;
+  
+  if (isSecure || isLocalhost) {
+    // Modo producción o local con privilegio
+    document.cookie = `${cookieBase}; Secure; SameSite=None`;
+    console.log('[Auth] Sesión síncrona: Secure; SameSite=None');
+  } else {
+    // Modo testing móvil por IP (HTTP)
+    console.warn('[Auth] Detectada conexión HTTP por IP. Usando cookies Lax sin Secure para compatibilidad móvil.');
+    document.cookie = `${cookieBase}; SameSite=Lax`;
+  }
+
+  // Verificación inmediata de persistencia
+  const isSet = document.cookie.includes('__session=');
+  if (!isSet) {
+    console.error('[Auth] CRITICAL: El navegador rechazó la cookie de sesión. Verificá la configuración de privacidad o si estás en modo incógnito.');
+  } else {
+    console.log('[Auth] Cookie de sesión verificada y persistida.');
+  }
 }
 
 export { sendEmailVerification, getRedirectResult };

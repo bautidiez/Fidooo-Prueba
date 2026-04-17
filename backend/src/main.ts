@@ -25,9 +25,11 @@ async function bootstrap() {
   const port = configService.get('port', { infer: true });
 
   // --- CONFIGURACIÓN DE SEGURIDAD (CORS) ---
-  // IMPORTANTE: Solo permite peticiones desde la URL del frontend definida en variables de entorno.
+  // IMPORTANTE: Soporta múltiples orígenes si se definen separados por coma en FRONTEND_URL.
+  const origins = frontendUrl.split(',').map(u => u.trim()).filter(Boolean);
+  
   app.enableCors({
-    origin: frontendUrl,
+    origin: origins.length > 1 ? origins : origins[0] || '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -44,6 +46,6 @@ async function bootstrap() {
 
   await app.listen(port);
   logger.log(`Backend de FibooChat corriendo en puerto: ${port}`);
-  logger.log(`Aceptando requests del frontend: ${frontendUrl}`);
+  logger.log(`Aceptando requests del frontend: ${origins.join(', ')}`);
 }
 bootstrap();
