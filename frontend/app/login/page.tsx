@@ -25,15 +25,35 @@ export default function LoginPage() {
   useAuth();
 
   /**
-   * UX FIX: Si venimos de un redirect de Google, mostramos el spinner de inmediato.
-   * Esto evita un "flickeo" visual mientras Firebase procesa getRedirectResult().
+   * MANEJO DE REDIRECCIÓN DE GOOGLE (Centralizado):
+   * Captura el resultado si venimos de un Redirect de Google y controla el Spinner local.
    */
   useEffect(() => {
     const pending = sessionStorage.getItem('pendingGoogleRedirect');
-    if (pending) {
-      setIsProcessingRedirect(true);
-    }
-  }, []);
+    if (!pending) return; // Si no hay redirect pendiente, no hacemos nada
+
+    setIsProcessingRedirect(true);
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result?.user) {
+          // Éxito: Sincronizamos cookie y navegamos al chat
+          const token = await result.user.getIdToken();
+          setSessionCookie(token);
+          sessionStorage.removeItem('pendingGoogleRedirect');
+          router.push('/chat');
+        } else {
+          // Caso en que Google vuelve pero no hay usuario (ej: volvió a entrar solo)
+          sessionStorage.removeItem('pendingGoogleRedirect');
+          setIsProcessingRedirect(false);
+        }
+      })
+      .catch((err) => {
+        console.error('[LoginPage] Error en redirect de Google:', err);
+        sessionStorage.removeItem('pendingGoogleRedirect');
+        setIsProcessingRedirect(false);
+      });
+  }, [router]);
   
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
@@ -119,7 +139,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.7
+          Powered by ChatGPT • Firebase • Fidooo v1.8
         </p>
       </div>
     </main>
