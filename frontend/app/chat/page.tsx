@@ -66,17 +66,17 @@ export default function ChatPage() {
                 </svg>
             </div>
             
-            <h2 className="mb-3 text-2xl font-bold text-white tracking-tight">Acceso Restringido</h2>
+            <h2 className="mb-3 text-2xl font-bold text-white tracking-tight">Activación de Cuenta</h2>
             <p className="mb-8 text-sm text-white/50 leading-relaxed max-w-xs">
-              Tu cuenta de <span className="text-[#1ebbf4] font-semibold">{user.email}</span> aún no está verificada. Por favor, activá el email que te enviamos para habilitar el chat.
+              Tu cuenta de <span className="text-[#1ebbf4] font-semibold">{user.email}</span> ya casi está lista. Si acabas de verificar tu email, ya podés entrar.
             </p>
 
             <div className="flex w-full flex-col gap-3">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full rounded-2xl bg-white/5 border border-white/10 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 cursor-pointer"
+                className="w-full rounded-2xl bg-gradient-to-r from-[#1ebbf4] to-[#84d6f6] px-6 py-3 text-sm font-bold text-[#0a0a0f] transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-[0_0_20px_rgba(30,187,244,0.3)]"
               >
-                Ya verifiqué, entrar ahora
+                Ir a Fidooo Chat
               </button>
               
               <button
