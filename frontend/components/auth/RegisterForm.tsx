@@ -260,7 +260,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
             // Pequeño delay de seguridad
             await new Promise(r => setTimeout(r, 200));
-            window.location.href = '/chat';
+            router.push('/chat');
           } catch (err: any) {
             if (err instanceof FirebaseError) {
               setError(getFirebaseErrorMessage(err.code));

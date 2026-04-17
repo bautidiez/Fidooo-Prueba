@@ -14,9 +14,12 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('__session')?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. Si el usuario intenta acceder al chat sin sesión, redirigir a login
+  // 1. Si el usuario intenta acceder al chat sin sesión
+  // DESACTIVADO TEMPORALMENTE: Permite que /chat cargue y useAuth (cliente) verifique la sesión.
+  // Esto evita bucles de redirección infinita en móviles con cookies lentas.
   if (pathname.startsWith('/chat') && !session) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    // return NextResponse.redirect(new URL('/login', request.url));
+    console.log('[Middleware] Acceso a /chat sin cookie. Permitiendo paso para verificación en cliente.');
   }
 
   // 2. Si el usuario ya tiene sesión e intenta ir a login, redirigir al chat

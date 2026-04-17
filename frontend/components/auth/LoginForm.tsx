@@ -55,7 +55,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
       // Pequeño delay de seguridad para asegurar que el navegador escriba la cookie
       await new Promise(r => setTimeout(r, 200));
-      window.location.href = '/chat';
+      router.push('/chat');
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
@@ -125,7 +125,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
             setSessionCookie(token);
             // Pequeño delay de seguridad
             await new Promise(r => setTimeout(r, 150));
-            window.location.href = '/chat';
+            router.push('/chat');
           } catch (err: any) {
             if (err instanceof FirebaseError) {
               setError(getFirebaseErrorMessage(err.code));

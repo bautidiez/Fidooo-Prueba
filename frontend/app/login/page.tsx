@@ -39,7 +39,7 @@ export default function LoginPage() {
           setSessionCookie(token);
           // Pequeño delay de seguridad para móviles
           await new Promise(r => setTimeout(r, 150));
-          window.location.href = '/chat';
+          router.push('/chat');
         }
       } catch (err) {
         console.error('Error al procesar el resultado de redirección:', err);
