@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { getRedirectResult, auth } from '@/lib/firebase/auth';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
@@ -16,8 +18,35 @@ type AuthTab = 'login' | 'register' | 'reset';
  * PROBLEMA QUE RESUELVE: Ofrece una experiencia fluida (SPA) para que el usuario gestione su cuenta.
  */
 export default function LoginPage() {
+  const router = useRouter();
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
+  const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
+
+  /**
+   * MANEJO DE REDIRECCIÓN DE GOOGLE (Móvil):
+   * Este efecto corre al cargar la página. Si venimos de un Redirect de Google,
+   * Firebase nos dará el resultado aquí.
+   */
+  useEffect(() => {
+    async function checkRedirect() {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          setIsProcessingRedirect(true);
+          const token = await result.user.getIdToken();
+          // Sincronizar sesión
+          document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+          router.push('/chat');
+        }
+      } catch (err) {
+        console.error('Error al procesar el resultado de redirección:', err);
+      } finally {
+        setIsProcessingRedirect(false);
+      }
+    }
+    checkRedirect();
+  }, [router]);
 
   const titles: Record<AuthTab, string> = {
     login: 'Bienvenido de vuelta',
@@ -55,25 +84,34 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-3xl border border-white/5 bg-white/5 p-5 md:p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden group">
-          {/* Subtle inner top glow */}
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-          
-          {/* Tab Title */}
-          <h2 className="mb-4 md:mb-6 text-lg md:text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
+        <div className="rounded-3xl border border-white/5 bg-white/5 p-5 md:p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden group min-h-[400px] flex flex-col justify-center">
+          {isProcessingRedirect ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-12">
+              <div className="size-12 rounded-full border-4 border-[#1ebbf4]/20 border-t-[#1ebbf4] animate-spin"></div>
+              <p className="text-sm text-white/50 font-medium">Finalizando sesión...</p>
+            </div>
+          ) : (
+            <>
+              {/* Subtle inner top glow */}
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              
+              {/* Tab Title */}
+              <h2 className="mb-4 md:mb-6 text-lg md:text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
 
-          {/* Forms */}
-          {activeTab === 'login' && (
-            <LoginForm
-              onSwitchToRegister={() => setActiveTab('register')}
-              onSwitchToReset={() => setActiveTab('reset')}
-            />
-          )}
-          {activeTab === 'register' && (
-            <RegisterForm onSwitchToLogin={() => setActiveTab('login')} />
-          )}
-          {activeTab === 'reset' && (
-            <ResetPasswordForm onSwitchToLogin={() => setActiveTab('login')} />
+              {/* Forms */}
+              {activeTab === 'login' && (
+                <LoginForm
+                  onSwitchToRegister={() => setActiveTab('register')}
+                  onSwitchToReset={() => setActiveTab('reset')}
+                />
+              )}
+              {activeTab === 'register' && (
+                <RegisterForm onSwitchToLogin={() => setActiveTab('login')} />
+              )}
+              {activeTab === 'reset' && (
+                <ResetPasswordForm onSwitchToLogin={() => setActiveTab('login')} />
+              )}
+            </>
           )}
         </div>
 

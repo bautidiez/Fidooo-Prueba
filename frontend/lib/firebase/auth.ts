@@ -14,6 +14,8 @@ import {
   sendEmailVerification,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   type UserCredential,
   type Auth,
 } from 'firebase/auth';
@@ -90,9 +92,24 @@ export async function checkEmailExists(email: string): Promise<boolean> {
   }
 }
 
-export async function signInWithGoogle(): Promise<UserCredential> {
+/**
+ * Inicia sesión con Google.
+ * Detecta si el usuario está en móvil para usar 'Redirect' (más robusto en celulares)
+ * o 'Popup' (mejor UX en escritorio).
+ */
+export async function signInWithGoogle(): Promise<UserCredential | void> {
   const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+  
+  // Detección básica de móvil para decidir el flujo de Auth
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // En móviles, redirigimos para evitar el bloqueo de popups
+    return signInWithRedirect(auth, provider);
+  } else {
+    // en escritorio, usamos el popup para no recargar la página del usuario
+    return signInWithPopup(auth, provider);
+  }
 }
 
-export { sendEmailVerification };
+export { sendEmailVerification, getRedirectResult };
