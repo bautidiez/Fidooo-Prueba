@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, getRedirectResult, type User as FirebaseUser } from 'firebase/auth';
 import { auth, setSessionCookie } from '@/lib/firebase/auth';
 import { useAuthStore } from '@/store/useAuthStore';
