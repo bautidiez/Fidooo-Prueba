@@ -22,18 +22,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: '/__/auth/:path*',
-        destination: `https://fiboochat.firebaseapp.com/__/auth/:path*`,
-      },
-      {
-        source: '/__/firebase/:path*',
-        destination: `https://fiboochat.firebaseapp.com/__/firebase/:path*`,
-      },
-    ];
-  },
   async headers() {
     return [
       {
@@ -87,6 +75,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Cross-Origin-Resource-Policy',
             value: 'same-site'
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none'
           }
         ],
       },
