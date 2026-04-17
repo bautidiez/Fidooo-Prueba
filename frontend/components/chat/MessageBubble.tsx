@@ -14,6 +14,13 @@ function formatTime(createdAt: Message['createdAt']): string {
   return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * Burbuja de Mensaje Individual.
+ * 
+ * QUÉ: Representa visualmente un mensaje de usuario o de la IA.
+ * POR QUÉ: Centraliza el estilo y la lógica de renderizado según el rol (user/assistant).
+ * PROBLEMA QUE RESUELVE: Maneja el formato de texto y la alineación responsiva de los mensajes.
+ */
 export function MessageBubble({ message, userPhotoURL, userInitials }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 

@@ -7,6 +7,13 @@ import { useChatStore } from '@/store/useChatStore';
 import type { Conversation } from '@/types/message.types';
 import Image from 'next/image';
 
+/**
+ * Pantalla Lateral de Navegación e Historial.
+ * 
+ * QUÉ: Muestra la lista de conversaciones pasadas y permite crear nuevas.
+ * POR QUÉ: Facilita la multitarea y la persistencia de contexto entre diferentes hilos de chat.
+ * PROBLEMA QUE RESUELVE: Organiza el acceso a datos históricos y gestiona el layout responsivo.
+ */
 export function Sidebar() {
   const { user } = useAuth();
   const { activeConversationId, setActiveConversationId, isSidebarOpen, setSidebarOpen } = useChatStore();

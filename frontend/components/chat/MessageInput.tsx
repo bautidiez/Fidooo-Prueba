@@ -7,6 +7,13 @@ interface MessageInputProps {
   isDisabled?: boolean;
 }
 
+/**
+ * Campo de Entrada de Mensajes.
+ * 
+ * QUÉ: Área de texto interactiva para enviar prompts a la IA.
+ * POR QUÉ: Permite la interacción del usuario con el sistema de chat.
+ * PROBLEMA QUE RESUELVE: Gestiona el estado de escritura, el envío mediante Enter y los bloqueos de carga.
+ */
 export function MessageInput({ onSend, isDisabled = false }: MessageInputProps) {
   const [value, setValue] = useState('');
   const [isSending, setIsSending] = useState(false);

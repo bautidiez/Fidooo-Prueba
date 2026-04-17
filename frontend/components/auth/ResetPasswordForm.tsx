@@ -10,6 +10,13 @@ interface ResetPasswordFormProps {
   onSwitchToLogin: () => void;
 }
 
+/**
+ * Componente de Recuperación de Contraseña.
+ * 
+ * QUÉ: Permite solicitar un link de reseteo de cuenta a través de email.
+ * POR QUÉ: Ofrece una vía de recuperación segura para el usuario.
+ * PROBLEMA QUE RESUELVE: Reduce la pérdida de cuentas y valida la existencia del usuario antes de enviar.
+ */
 export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);

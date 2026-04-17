@@ -1,3 +1,10 @@
+/**
+ * Servicios de Autenticación de Firebase (Lado Cliente).
+ * 
+ * QUÉ: Centraliza la lógica de login, registro, reseteo de clave y Google Auth.
+ * POR QUÉ: Desacopla la complejidad del SDK de Firebase de los componentes de la interfaz.
+ * PROBLEMA QUE RESUELVE: Facilita la gestión de errores y la validación de usuarios en toda la app.
+ */
 import {
   getAuth,
   signInWithEmailAndPassword,

@@ -1,3 +1,10 @@
+/**
+ * Capa de Persistencia y Tiempo Real con Firestore (Lado Cliente).
+ * 
+ * QUÉ: Gestiona la lectura, escritura y escucha activa (listeners) de mensajes y conversaciones.
+ * POR QUÉ: Centraliza el modelo de datos y las consultas complejas de base de datos.
+ * PROBLEMA QUE RESUELVE: Provee una API limpia al frontend para manejar chats sincronizados sin latencia percibida.
+ */
 import {
   getFirestore,
   collection,

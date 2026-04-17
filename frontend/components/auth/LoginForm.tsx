@@ -12,6 +12,13 @@ interface LoginFormProps {
   onSwitchToReset: () => void;
 }
 
+/**
+ * Componente de Formulario de Inicio de Sesión.
+ * 
+ * QUÉ: Maneja la entrada de credenciales y la autenticación con Firebase.
+ * POR QUÉ: Es la puerta de entrada principal para usuarios registrados.
+ * PROBLEMA QUE RESUELVE: Valida identidad y genera la cookie de sesión para el middleware.
+ */
 export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
