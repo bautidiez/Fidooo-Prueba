@@ -98,6 +98,10 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
           try {
             const { signInWithGoogle } = await import('@/lib/firebase/auth');
             const credential = await signInWithGoogle();
+            
+            // Si no hay credential, es porque se inició un Redirect (común en móviles)
+            if (!credential) return;
+
             const token = await credential.user.getIdToken();
             document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
             router.push('/chat');
