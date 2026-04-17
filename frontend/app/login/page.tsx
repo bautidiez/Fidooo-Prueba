@@ -23,11 +23,11 @@ export default function LoginPage() {
   const router = useRouter();
   // Enganchamos el hook de auth para capturar redirecciones automáticamente
   const { user } = useAuth();
-  console.log('[LoginPage] Estado actual - isProcessingRedirect:', isProcessingRedirect, 'user:', !!user);
   
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
   const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
+  console.log('[LoginPage] Estado actual - isProcessingRedirect:', isProcessingRedirect, 'user:', !!user);
 
   /**
    * MANEJO DE REDIRECCIÓN DE Google (Centralizado):
