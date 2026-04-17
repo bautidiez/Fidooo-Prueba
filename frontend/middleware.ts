@@ -12,7 +12,14 @@ import type { NextRequest } from 'next/server';
  */
 export function middleware(request: NextRequest) {
   const session = request.cookies.get('__session')?.value;
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Detectamos si venimos de un redirect de Google
+  // Firebase agrega params como 'code' o 'state' en la URL de retorno
+  const isGoogleRedirect = 
+    searchParams.has('code') || 
+    searchParams.has('state') ||
+    request.nextUrl.hash.includes('google');
 
   // 1. Protección de /chat: Si no hay sesión, mandamos a login
   if (pathname.startsWith('/chat') && !session) {
@@ -20,7 +27,9 @@ export function middleware(request: NextRequest) {
   }
 
   // 2. Si el usuario ya tiene sesión e intenta ir a login, redirigir al chat
-  if (pathname.startsWith('/login') && session) {
+  // EXCEPCIÓN: Si viene de un redirect de Google, permitimos que entre a /login para que
+  // el cliente pueda procesar getRedirectResult() correctamente antes de ir al chat.
+  if (pathname.startsWith('/login') && session && !isGoogleRedirect) {
     return NextResponse.redirect(new URL('/chat', request.url));
   }
 

@@ -23,6 +23,17 @@ export default function LoginPage() {
   const router = useRouter();
   // Enganchamos el hook de auth para capturar redirecciones automáticamente
   useAuth();
+
+  /**
+   * UX FIX: Si venimos de un redirect de Google, mostramos el spinner de inmediato.
+   * Esto evita un "flickeo" visual mientras Firebase procesa getRedirectResult().
+   */
+  useEffect(() => {
+    const pending = sessionStorage.getItem('pendingGoogleRedirect');
+    if (pending) {
+      setIsProcessingRedirect(true);
+    }
+  }, []);
   
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
@@ -108,7 +119,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.6
+          Powered by ChatGPT • Firebase • Fidooo v1.7
         </p>
       </div>
     </main>
