@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { confirmPasswordReset, verifyPasswordResetCode, applyActionCode, getAuth } from 'firebase/auth';
+import { confirmPasswordReset, verifyPasswordResetCode, applyActionCode, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { app } from '@/lib/firebase/config';
 import { getFirebaseErrorMessage } from '@/lib/firebase/auth';
