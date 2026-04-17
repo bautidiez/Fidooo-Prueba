@@ -53,7 +53,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 e.stopPropagation();
                 setIsVisible(!isVisible);
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 text-white/40 hover:text-white/80 transition-all rounded-lg hover:bg-white/10 active:scale-90 cursor-pointer"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2 text-white/40 hover:text-[#1ebbf4] transition-all rounded-lg hover:bg-white/10 active:scale-90"
+              style={{ cursor: 'pointer' }}
               tabIndex={-1}
               aria-label={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
             >

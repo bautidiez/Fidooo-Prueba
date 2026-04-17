@@ -98,7 +98,13 @@ export default function LoginPage() {
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1ebbf4]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
               
               {/* Tab Title */}
-              <h2 className="mb-4 md:mb-6 text-lg md:text-xl font-semibold text-white tracking-tight">{titles[activeTab]}</h2>
+              <h2 
+                className="mb-4 md:mb-6 text-lg md:text-xl font-semibold text-white tracking-tight cursor-pointer"
+                style={{ cursor: 'pointer' }}
+                tabIndex={-1}
+              >
+                {titles[activeTab]}
+              </h2>
 
               {/* Forms */}
               {activeTab === 'login' && (
@@ -118,7 +124,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.1
+          Powered by ChatGPT • Firebase • Fidooo v1.2
         </p>
       </div>
     </main>
