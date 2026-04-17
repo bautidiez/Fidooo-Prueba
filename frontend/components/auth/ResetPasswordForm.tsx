@@ -36,7 +36,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
       const exists = await checkEmailExists(email);
       
       if (!exists) {
-        setError('Email no registrado.');
+        setError('Este email no está registrado.');
         setIsLoading(false);
         return;
       }

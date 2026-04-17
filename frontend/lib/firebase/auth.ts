@@ -26,10 +26,10 @@ const auth: Auth = getAuth(app);
 export { auth };
 
 export const FIREBASE_AUTH_ERRORS: Record<string, string> = {
-  'auth/user-not-found': 'Email no registrado.',
+  'auth/user-not-found': 'Este email no está registrado.',
   'auth/wrong-password': 'Contraseña incorrecta. Intentá de nuevo.',
   'auth/invalid-credential': 'Email o contraseña incorrectos.',
-  'auth/email-already-in-use': 'Ese email ya está registrado.',
+  'auth/email-already-in-use': 'Este email ya está registrado.',
   'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
   'auth/invalid-email': 'El email no tiene un formato válido.',
   'auth/too-many-requests': 'Demasiados intentos. Esperá un momento e intentá de nuevo.',
