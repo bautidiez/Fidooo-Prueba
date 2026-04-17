@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { auth } from '@/lib/firebase/auth';
+import { onAuthStateChanged, getRedirectResult, type User as FirebaseUser } from 'firebase/auth';
+import { auth, setSessionCookie } from '@/lib/firebase/auth';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { User } from '@/types/user.types';
 
@@ -14,14 +14,32 @@ import type { User } from '@/types/user.types';
  * PROBLEMA QUE RESUELVE: Mantener sincronizado el store global con la persistencia de Firebase.
  */
 export function useAuth(): { user: User | null; isLoading: boolean } {
+  const router = useRouter();
   const { user, isLoading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
     /**
+     * CAPTURA DE REDIRECCIÓN (GOOGLE):
+     * Maneja el caso en que el usuario vuelve de loguearse con Google en móvil.
+     */
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result?.user) {
+          const token = await result.user.getIdToken();
+          setSessionCookie(token);
+          // Redirección inmediata tras Google Redirect
+          if (window.location.pathname === '/login') {
+            router.push('/chat');
+          }
+        }
+      })
+      .catch((err) => console.error('[useAuth] Error en Redirect:', err));
+
+    /**
      * OBSERVER DE FIREBASE: onAuthStateChanged.
      * Escucha activamente cambios en la sesión (Login, Logout, Token Refresh).
      */
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       try {
         if (firebaseUser) {
           // MAPEO: Convertimos el objeto de Firebase a nuestro tipo de dominio User.
@@ -33,6 +51,11 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
             emailVerified: firebaseUser.emailVerified,
           };
           setUser(user);
+
+          // AUTO-SINCRONIZACIÓN DE COOKIE:
+          // Aseguramos que la cookie esté siempre presente para el Middleware.
+          const token = await firebaseUser.getIdToken();
+          setSessionCookie(token);
         } else {
           // Si no hay sesión, nos aseguramos de que el store esté limpio.
           setUser(null);

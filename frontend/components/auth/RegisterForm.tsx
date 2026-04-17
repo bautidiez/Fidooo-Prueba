@@ -234,30 +234,6 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           setIsLoading(true);
           setError(null);
           try {
-            const { signInWithGoogle } = await import('@/lib/firebase/auth');
-            const credential = await signInWithGoogle();
-
-            // Si no hay credential, es porque se inició un Redirect (común en móviles)
-            if (!credential) return;
-
-            const token = await credential.user.getIdToken();
-            setSessionCookie(token);
-            
-            // Verificación para diagnóstico en móviles
-            const isCookieSet = document.cookie.includes('__session=');
-            if (!isCookieSet) {
-              await Swal.fire({
-                icon: 'error',
-                title: 'Error de Sesión',
-                text: 'Tu navegador rechazó la sesión tras la redirección de Google. Verificá los permisos de cookies.',
-                background: '#1c1c1c',
-                color: '#fff',
-                confirmButtonColor: '#1ebbf4'
-              });
-              setIsLoading(false);
-              return;
-            }
-
             // Pequeño delay de seguridad
             await new Promise(r => setTimeout(r, 200));
             router.push('/chat');

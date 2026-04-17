@@ -34,25 +34,6 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
     try {
       const credential = await signIn(email, password);
-      const token = await credential.user.getIdToken();
-      // Sincronización robusta de sesión
-      setSessionCookie(token);
-
-      // Verificación para diagnóstico en móviles
-      const isCookieSet = document.cookie.includes('__session=');
-      if (!isCookieSet) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Error de Sesión',
-          text: 'Tu navegador rechazó la sesión. Intentá desactivar el modo incógnito o permitir cookies.',
-          background: '#1c1c1c',
-          color: '#fff',
-          confirmButtonColor: '#1ebbf4'
-        });
-        setIsLoading(false);
-        return;
-      }
-
       // Pequeño delay de seguridad para asegurar que el navegador escriba la cookie
       await new Promise(r => setTimeout(r, 200));
       router.push('/chat');
@@ -118,11 +99,6 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
             const { signInWithGoogle } = await import('@/lib/firebase/auth');
             const credential = await signInWithGoogle();
             
-            // Si no hay credential, es porque se inició un Redirect (común en móviles)
-            if (!credential) return;
-
-            const token = await credential.user.getIdToken();
-            setSessionCookie(token);
             // Pequeño delay de seguridad
             await new Promise(r => setTimeout(r, 150));
             router.push('/chat');

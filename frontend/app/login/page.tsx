@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getRedirectResult, auth, setSessionCookie, getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import { useAuth } from '@/hooks/useAuth';
 import Swal from 'sweetalert2';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
@@ -20,6 +21,9 @@ type AuthTab = 'login' | 'register' | 'reset';
  */
 export default function LoginPage() {
   const router = useRouter();
+  // Enganchamos el hook de auth para capturar redirecciones automáticamente
+  useAuth();
+  
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
   const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
@@ -29,35 +33,6 @@ export default function LoginPage() {
    * Este efecto corre al cargar la página. Si venimos de un Redirect de Google,
    * Firebase nos dará el resultado aquí.
    */
-  useEffect(() => {
-    async function checkRedirect() {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          setIsProcessingRedirect(true);
-          const token = await result.user.getIdToken();
-          // Sincronizar sesión robusta
-          setSessionCookie(token);
-          // Pequeño delay de seguridad para móviles
-          await new Promise(r => setTimeout(r, 150));
-          router.push('/chat');
-        }
-      } catch (err: any) {
-        console.error('Error al procesar el resultado de redirección:', err);
-        await Swal.fire({
-          icon: 'error',
-          title: 'Error de Autenticación',
-          text: `Google no pudo iniciar sesión: ${err.message || 'Error desconocido'}. Verificá si el dominio está autorizado en Firebase.`,
-          background: '#1c1c1c',
-          color: '#fff',
-          confirmButtonColor: '#1ebbf4'
-        });
-      } finally {
-        setIsProcessingRedirect(false);
-      }
-    }
-    checkRedirect();
-  }, [router]);
 
   const titles: Record<AuthTab, string> = {
     login: 'Bienvenido de vuelta',
@@ -133,7 +108,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.4
+          Powered by ChatGPT • Firebase • Fidooo v1.5
         </p>
       </div>
     </main>
