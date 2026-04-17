@@ -78,6 +78,9 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
           <p className="mt-1 text-sm text-white/50">
             Revisá tu bandeja de entrada para restablecer tu contraseña.
           </p>
+          <p className="mt-3 text-[11px] text-white/30 italic">
+            "No olvides revisar tu carpeta de Spam si no lo recibís en unos minutos."
+          </p>
         </div>
 
         <div className="flex flex-col gap-2 w-full mt-2">
