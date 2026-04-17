@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com;",
               "base-uri 'self';",
               "form-action 'self' https://*.firebaseapp.com https://*.googleapis.com;",
+              "upgrade-insecure-requests;",
               "object-src 'none';"
             ].join(' ')
           },
@@ -58,6 +59,22 @@ const nextConfig: NextConfig = {
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups'
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-site'
           }
         ],
       },

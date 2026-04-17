@@ -164,7 +164,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.14
+          Powered by ChatGPT • Firebase • Fidooo v1.15
         </p>
       </div>
     </main>
