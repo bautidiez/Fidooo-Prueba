@@ -1,3 +1,10 @@
+/**
+ * Configuración central de Firebase para el cliente.
+ * 
+ * QUÉ: Inicializa la conexión con los servicios de Firebase (Auth, Firestore, etc).
+ * POR QUÉ: Centraliza las credenciales y permite exportar una instancia única (Singleton).
+ * PROBLEMA QUE RESUELVE: Evita errores de re-inicialización en el entorno de desarrollo de Next.js.
+ */
 import { getApps, initializeApp, getApp, type FirebaseApp } from 'firebase/app';
 
 const firebaseConfig = {

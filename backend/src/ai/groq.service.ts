@@ -8,6 +8,13 @@ import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import type { AppConfig } from '../config/configuration';
 
+/**
+ * Servicio encargado de la comunicación con Groq AI.
+ * 
+ * QUÉ: Envía mensajes de usuario a los modelos de Llama hospedados en Groq.
+ * POR QUÉ: Se eligió Groq sobre OpenAI/Gemini por su velocidad (LPU) y su tier gratuito.
+ * VENTAJA TÉCNICA: Inferencia en hardware especializado (LPU) que reduce la latencia drásticamente.
+ */
 @Injectable()
 export class GroqService implements OnModuleInit {
   private readonly logger = new Logger(GroqService.name);
@@ -16,9 +23,14 @@ export class GroqService implements OnModuleInit {
 
   constructor(private readonly configService: ConfigService<AppConfig, true>) {}
 
+  /**
+   * Inicialización del cliente de Groq.
+   * Se ejecuta al arrancar el módulo de NestJS.
+   */
   onModuleInit(): void {
     const apiKey = this.configService.get('groq', { infer: true }).apiKey;
 
+    // Si falta la API Key, el servicio entra en modo Mock para evitar errores críticos
     if (!apiKey) {
       this.logger.warn(
         'GROQ_API_KEY no configurada — Fallback a Gemini o Mock',
@@ -28,6 +40,7 @@ export class GroqService implements OnModuleInit {
     }
 
     try {
+      // Groq utiliza el SDK de OpenAI con un baseURL diferente, facilitando la integración
       this.client = new OpenAI({ 
         apiKey,
         baseURL: 'https://api.groq.com/openai/v1',

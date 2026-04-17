@@ -12,18 +12,30 @@ import { useChatStore } from '@/store/useChatStore';
 
 import { Sidebar } from '@/components/layout/Sidebar';
 
+/**
+ * Página principal del Chat.
+ * 
+ * QUÉ: Componente principal que orquesta el Sidebar y la Ventana de Chat.
+ * POR QUÉ: Es la vista protegida central de la aplicación.
+ * PROBLEMA QUE RESUELVE: Maneja la verificación de sesión y el estado de verificación de email antes de mostrar el chat.
+ */
 export default function ChatPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const { isSidebarOpen, setSidebarOpen } = useChatStore();
 
+  /**
+   * Cierra la sesión del usuario tanto en Firebase como en la cookie local.
+   */
   async function handleSignOut(): Promise<void> {
     await signOutUser();
-    // Clear session cookie
+    // Limpieza de cookie para que el middleware detecte el logout
     document.cookie = '__session=; path=/; max-age=0';
     router.push('/login');
   }
 
+  // --- Protección de Ruta (Modo Cliente) ---
+  // Nota: El middleware.ts protege esta ruta a nivel de servidor, esto es un fallback visual.
   if (isLoading) {
     return (
       <div className="flex h-dvh items-center justify-center bg-[#1c1c1c]">
@@ -37,10 +49,14 @@ export default function ChatPage() {
     return null;
   }
 
-  // Block access if email is not verified
+  /**
+   * REQUISITO TÉCNICO: Verificación de email obligatoria.
+   * Si el usuario no ha verificado su cuenta, no puede ver el chat.
+   */
   if (!user.emailVerified) {
     return (
       <div className="flex h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-20 relative overflow-hidden">
+        {/* UI de Bloqueo por falta de verificación */}
         <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
         
         <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
@@ -159,7 +175,7 @@ export default function ChatPage() {
               onClick={() => void handleSignOut()}
               aria-label="Cerrar sesión"
               className="group flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5
-                text-[11px] font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] active:scale-95"
+                text-[11px] font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] active:scale-95 cursor-pointer"
             >
               <svg className="size-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

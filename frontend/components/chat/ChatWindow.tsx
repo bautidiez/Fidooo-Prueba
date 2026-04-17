@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { addMessage, createConversation } from '@/lib/firebase/firestore';
 import { useAuth, getIdToken } from '@/hooks/useAuth';
@@ -23,6 +23,13 @@ if (BACKEND_URL && !BACKEND_URL.startsWith('http')) {
 }
 BACKEND_URL = BACKEND_URL.replace(/\/$/, ''); // Quitar barra final si existe
 
+/**
+ * Ventana principal de mensajes del chat.
+ * 
+ * QUÉ: Contenedor que muestra la lista de mensajes y el input de envío.
+ * POR QUÉ: Es el área central de interacción de la aplicación.
+ * PROBLEMA QUE RESUELVE: Coordina el envío de mensajes al servidor (IA) y la visualización reactiva.
+ */
 export function ChatWindow({ userId }: ChatWindowProps) {
   const { user } = useAuth();
   const { activeConversationId, setActiveConversationId, setReplying, isReplying } = useChatStore();

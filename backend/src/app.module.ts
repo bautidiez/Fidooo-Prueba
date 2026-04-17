@@ -6,6 +6,13 @@ import { ChatModule } from './chat/chat.module';
 import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 
+/**
+ * Módulo raíz de la aplicación NestJS.
+ * 
+ * QUÉ: Orquesta la inyección de dependencias de todos los módulos del backend.
+ * POR QUÉ: Permite una estructura modular y escalable.
+ * CARACTERÍSTICA: Centraliza la configuración global del entorno (ConfigModule).
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({

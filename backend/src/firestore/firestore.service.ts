@@ -10,16 +10,34 @@ export interface NewMessage {
   conversationId: string;
 }
 
+/**
+ * Servicio para la persistencia de datos en Firestore.
+ * 
+ * QUÉ: Gatekeeper para todas las operaciones de escritura en la base de datos de Firebase.
+ * POR QUÉ: Centraliza el acceso a Firestore usando el Admin SDK (bypass de reglas de seguridad locales).
+ * MODELO DE DATOS: Estructura jerárquica para escalabilidad y seguridad por usuario:
+ * chats (col) -> userId (doc) -> conversations (col) -> convID (doc) -> messages (col)
+ */
 @Injectable()
 export class FirestoreService {
   private readonly logger = new Logger(FirestoreService.name);
 
   constructor(private readonly firebaseService: FirebaseService) {}
 
+  /**
+   * Registra un nuevo mensaje en una conversación específica.
+   * 
+   * Flujo:
+   * 1. Navega por la jerarquía de colecciones hasta la conversación del usuario.
+   * 2. Agrega el documento del mensaje con su timestamp.
+   * 3. Actualiza el metadato 'updatedAt' de la conversación para ordenamiento en el sidebar.
+   * 
+   * @param {NewMessage} message - Datos del mensaje a guardar.
+   */
   async addMessage(message: NewMessage): Promise<void> {
     const { content, role, userId, conversationId } = message;
     
-    // 1. Reference to the specific conversation messages
+    // --- Referencia a la subcolección de mensajes del usuario ---
     const messagesRef = this.firebaseService.firestore
       .collection('chats')
       .doc(userId)
@@ -27,26 +45,26 @@ export class FirestoreService {
       .doc(conversationId)
       .collection('messages');
 
-    // 2. Add the message
+    // --- Inserción del mensaje ---
     await messagesRef.add({
       content,
       role,
       userId,
-      createdAt: admin.firestore.Timestamp.now(),
+      createdAt: admin.firestore.Timestamp.now(), // Timestamp del servidor para orden cronológico
     });
 
-    // 3. Update conversation metadata (last update and title if first message)
-    // For titles, we can do it on the frontend or here. For now, just touch updatedAt.
+    // --- Actualización de metadatos de la conversación ---
     const conversationRef = this.firebaseService.firestore
       .collection('chats')
       .doc(userId)
       .collection('conversations')
       .doc(conversationId);
 
+    // Usamos merge: true para no borrar otros campos (como el título) si existieran
     await conversationRef.set({
       updatedAt: admin.firestore.Timestamp.now(),
     }, { merge: true });
 
-    this.logger.debug(`Message saved [${role}] in conv ${conversationId} for user ${userId}`);
+    this.logger.debug(`Mensaje guardado [${role}] en la conversación ${conversationId}`);
   }
 }

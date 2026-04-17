@@ -2,10 +2,10 @@ import * as Joi from 'joi';
 
 export const validationSchema = Joi.object({
   PORT: Joi.number().default(3001),
-  FRONTEND_URL: Joi.string().uri().required(),
+  FRONTEND_URL: Joi.string().required(), // Eliminamos .uri() para permitir limpieza manual si es necesario
   OPENAI_API_KEY: Joi.string().optional().allow(''),
   GEMINI_API_KEY: Joi.string().optional().allow(''),
-  GROQ_API_KEY: Joi.string().optional().allow(''), // Added Groq support
+  GROQ_API_KEY: Joi.string().optional().allow(''),
   PROJECT_ID: Joi.string().required(),
   PRIVATE_KEY: Joi.string().required(),
   CLIENT_EMAIL: Joi.string().email().required(),
@@ -32,7 +32,7 @@ export interface AppConfig {
 
 export const configuration = (): AppConfig => ({
   port: parseInt(process.env.PORT ?? '3001', 10),
-  frontendUrl: process.env.FRONTEND_URL!,
+  frontendUrl: (process.env.FRONTEND_URL ?? '').trim(),
   openai: {
     apiKey: process.env.OPENAI_API_KEY ?? '',
   },
@@ -46,8 +46,8 @@ export const configuration = (): AppConfig => ({
     projectId: process.env.PROJECT_ID!,
     privateKey: (process.env.PRIVATE_KEY ?? '')
       .trim()
-      .replace(/^"+|"+$/g, '') // Remove leading/trailing quotes
-      .replace(/\\n/g, '\n'),
+      .replace(/^['"]+|['"]+$/g, '') // Elimina comillas simples o dobles al inicio/final
+      .replace(/\\n/g, '\n'),        // Convierte \n literales en saltos de línea reales
     clientEmail: process.env.CLIENT_EMAIL!,
   },
 });

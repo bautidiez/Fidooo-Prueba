@@ -17,7 +17,7 @@ const auth: Auth = getAuth(app);
 export { auth };
 
 export const FIREBASE_AUTH_ERRORS: Record<string, string> = {
-  'auth/user-not-found': 'No existe una cuenta con ese email.',
+  'auth/user-not-found': 'Email no registrado.',
   'auth/wrong-password': 'Contraseña incorrecta. Intentá de nuevo.',
   'auth/invalid-credential': 'Email o contraseña incorrectos.',
   'auth/email-already-in-use': 'Ese email ya está registrado.',
@@ -48,25 +48,21 @@ export async function resetPassword(email: string): Promise<void> {
 }
 
 export async function checkEmailExists(email: string): Promise<boolean> {
-  let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+  let backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || '').trim().replace(/\/+$/, '');
   
-  // Si no hay URL, intentamos una ruta por defecto o fallamos seguro
   if (!backendUrl) {
-    console.warn('NEXT_PUBLIC_BACKEND_URL is not defined.');
-    return true;
+    console.error('CRITICAL: NEXT_PUBLIC_BACKEND_URL is not defined in environment variables.');
+    return true; 
   }
 
-  // Aseguramos que tenga el protocolo https://
+  // Aseguramos protocolo https:// si no lo tiene
   if (!backendUrl.startsWith('http')) {
     backendUrl = `https://${backendUrl}`;
   }
 
-  // Limpiamos barras diagonales al final para evitar // en la URL
-  backendUrl = backendUrl.replace(/\/+$/, '');
-  
   try {
     const targetUrl = `${backendUrl}/auth/check-email`;
-    console.log(`Checking email existence at: ${targetUrl}`);
+    console.log(`[Auth] Checking email existence at: ${targetUrl}`);
     
     const response = await fetch(targetUrl, {
       method: 'POST',
@@ -74,18 +70,15 @@ export async function checkEmailExists(email: string): Promise<boolean> {
       body: JSON.stringify({ email }),
     });
 
-    console.log(`Backend response status: ${response.status}`);
-
     if (!response.ok) {
-      console.warn('Backend verification failed or not found. Falling back to default behavior.');
+      console.error(`[Auth] Backend error: ${response.status} ${response.statusText}`);
       return true; 
     }
 
     const data = await response.json();
-    console.log('Backend verification result:', data);
     return data.registered === true;
   } catch (error) {
-    console.error('Error connecting to backend for email check:', error);
+    console.error('[Auth] Network error while checking email:', error);
     return true; 
   }
 }
