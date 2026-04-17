@@ -21,21 +21,23 @@ import { Sidebar } from '@/components/layout/Sidebar';
  */
 export default function ChatPage() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
-  const { isSidebarOpen, setSidebarOpen } = useChatStore();
+  const { user, isLoading } = useAuth(); // Hook que monitorea la sesión activa
+  const { isSidebarOpen, setSidebarOpen } = useChatStore(); // Estado global del layout
 
   /**
-   * Cierra la sesión del usuario tanto en Firebase como en la cookie local.
+   * Cierra la sesión del usuario tanto en Firebase como en la persistencia local.
+   * POR QUÉ: Firebase no borra cookies automáticamente; debemos hacerlo manualmente 
+   *          para que el middleware de Next.js detecte el logout.
    */
   async function handleSignOut(): Promise<void> {
     await signOutUser();
-    // Limpieza de cookie para que el middleware detecte el logout
+    // Limpieza de cookie de sesión:
     document.cookie = '__session=; path=/; max-age=0';
     router.push('/login');
   }
 
-  // --- Protección de Ruta (Modo Cliente) ---
-  // Nota: El middleware.ts protege esta ruta a nivel de servidor, esto es un fallback visual.
+  // --- PROTECCIÓN VISUAL (CLIENT-SIDE) ---
+  // Mientras Firebase recupera la sesión, mostramos un loader premium.
   if (isLoading) {
     return (
       <div className="flex h-dvh items-center justify-center bg-[#1c1c1c]">

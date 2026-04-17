@@ -45,34 +45,47 @@ export function ChatWindow({ userId }: ChatWindowProps) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isReplying]);
 
+  /**
+   * MANEJADOR DE ENVÍO DE MENSAJES:
+   * 
+   * @param {string} content - Texto del mensaje del usuario.
+   * 
+   * FLUJO TÉCNICO:
+   * 1. Activa el estado 'replying' para bloquear el input y mostrar feedback visual.
+   * 2. Si es el primer mensaje, crea una 'conversation' nueva en Firestore.
+   * 3. Guarda el mensaje del 'user' en Firestore (Client SDK).
+   * 4. Obtiene el Firebase ID Token (JWT) para autenticarse contra el Backend NestJS.
+   * 5. Realiza un POST al backend enviando el prompt y el ID de conversación.
+   * 6. El backend procesará con la IA y guardará la respuesta en Firestore.
+   */
   async function handleSend(content: string): Promise<void> {
     setReplying(true);
 
     try {
       let currentConvId = activeConversationId;
 
-      // 1. Create conversation if none exists
+      // 1. Persistencia de la conversación inicial:
       if (!currentConvId) {
         currentConvId = await createConversation(userId, content.slice(0, 40));
         if (!currentConvId) throw new Error('No se pudo crear la conversación en Firebase.');
         setActiveConversationId(currentConvId);
       }
 
-      // 2. Save user message to Firestore
+      // 2. Persistencia del mensaje del usuario (Client Side):
       await addMessage(userId, currentConvId, content, 'user');
 
-      // 3. Get Firebase ID token
+      // 3. SEGURIDAD: Obtención del JWT de Firebase para validación en NestJS:
       const idToken = await getIdToken();
       if (!idToken) throw new Error('Sesión expirada. Por favor, reingresá.');
 
-      // 4. Call backend
+      // 4. COMUNICACIÓN BACKEND:
       if (!currentConvId) throw new Error('ID de conversación no encontrado.');
 
       const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
+          'Authorization': `Bearer ${idToken}`, // Header fundamental para el AuthGuard
         },
         body: JSON.stringify({ 
           message: content,
@@ -80,6 +93,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         }),
       });
 
+      // Manejo defensivo de errores del servidor:
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
@@ -90,11 +104,13 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         }
       }
 
-      // Assistant message is handled by backend + Firestore listener
+      // IMPORTANTE: La respuesta del asistente NO se maneja aquí.
+      // Se maneja a través del listener onSnapshot de Firestore en el hook useRealtimeMessages.
     } catch (error: any) {
       console.error('Error sending message:', error);
       const errorMessage = error.message || 'Error de conexión / Permisos';
       
+      // Fallback: Mostrar el error como un mensaje del asistente para mejorar la UX:
       if (activeConversationId) {
         try {
           await addMessage(userId, activeConversationId, `⚠️ Error: ${errorMessage}`, 'assistant');

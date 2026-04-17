@@ -44,10 +44,18 @@ export const configuration = (): AppConfig => ({
   },
   firebase: {
     projectId: process.env.PROJECT_ID!,
+    /**
+     * PROCESAMIENTO QUIRÚRGICO DE LA PRIVATE_KEY:
+     * El private key de Firebase suele venir con saltos de línea y a veces envuelto en comillas.
+     * Al configurarlo en Vercel, estos caracteres pueden corromperse (ej: \n como texto literal).
+     * 1. .trim(): Elimina espacios accidentales.
+     * 2. .replace(/^['"]+|['"]+$/g, ''): Remueve comillas envolventes opcionales.
+     * 3. .replace(/\\n/g, '\n'): Convierte la cadena "\n" en un salto de línea real (\n) para que el parser lo reconozca.
+     */
     privateKey: (process.env.PRIVATE_KEY ?? '')
       .trim()
-      .replace(/^['"]+|['"]+$/g, '') // Elimina comillas simples o dobles al inicio/final
-      .replace(/\\n/g, '\n'),        // Convierte \n literales en saltos de línea reales
+      .replace(/^['"]+|['"]+$/g, '') 
+      .replace(/\\n/g, '\n'),
     clientEmail: process.env.CLIENT_EMAIL!,
   },
 });

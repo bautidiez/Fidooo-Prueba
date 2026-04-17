@@ -27,33 +27,37 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly firebaseService: FirebaseService) {}
 
   /**
-   * Método principal de validación del Guard.
+   * Método principal de validación del Guard (Lifecycle hook de NestJS).
    * 
-   * Flujo de validación:
-   * 1. Extrae el token del header (Bearer Token).
-   * 2. Si no hay token, lanza UnauthorizedException (401).
-   * 3. Llama a Firebase Admin para verificar la firma y expiración del JWT.
-   * 4. Si es válido, inyecta el usuario decodificado en la petición (`request.user`) para uso posterior.
-   * 5. Retorna true para permitir el acceso al controlador.
+   * @param {ExecutionContext} context - Contexto de ejecución de la petición HTTP.
+   * @returns {Promise<boolean>} Retorna true si el token es válido, de lo contrario lanza error.
+   * 
+   * FLUJO PASO A PASO:
+   * 1. Obtiene el objeto Request de Express desde el contexto.
+   * 2. Llama a extractBearerToken para buscar el JWT en los headers.
+   * 3. Si el token no existe, el Guard bloquea la ejecución con un 401 Unauthorized.
+   * 4. Usa el Firebase Admin SDK (inyectado vía FirebaseService) para validar la firma.
+   * 5. Si la validación es exitosa, decodifica el JSON y lo inyecta en request['user'].
+   * 6. Esto permite que los Controllers accedan al UID del usuario logueado de forma segura.
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractBearerToken(request);
 
-    // Bloqueo inmediato si falta el token
+    // Bloqueo inmediato si el token es nulo o malformado
     if (!token) {
       throw new UnauthorizedException('Token de autorización requerido.');
     }
 
     try {
-      // Verificación externa con Firebase Admin SDK
+      // Verificación asíncrona contra los servidores de Google (vía Admin SDK)
       const decodedToken = await this.firebaseService.verifyIdToken(token);
       
-      // Adjuntar datos del usuario al request para controllers
+      // Adjuntamos el objeto decodificado al request. Es la base de la seguridad del backend.
       request.user = decodedToken;
       return true;
     } catch {
-      this.logger.warn('Token de Firebase inválido o expirado');
+      this.logger.warn('Intento de acceso con Token inválido o expirado detectado');
       throw new UnauthorizedException('Token inválido o expirado.');
     }
   }

@@ -9,17 +9,28 @@ import type { AuthState, User } from '@/types/user.types';
  * PROBLEMA QUE RESUELVE: Mantiene sincronizado si hay un usuario activo y su estado de carga inicial.
  */
 export const useAuthStore = create<AuthState>((set) => ({
-  // --- Estado ---
-  /** Usuario actualmente autenticado (null si no hay sesión) */
+  // --- ESTADO (STATE) ---
+  
+  /** 
+   * Usuario actualmente autenticado. 
+   * Se inicializa en null hasta que onAuthStateChanged responda. 
+   */
   user: null,
-  /** Indicador de si se está recuperando la sesión de Firebase al inicio */
+
+  /** 
+   * Indicador de carga inicial.
+   * Evita que la app muestre contenido protegido antes de verificar la sesión.
+   */
   isLoading: true,
 
-  // --- Acciones ---
-  /** Actualiza el estado del usuario tras el login o cambio de estado de auth */
+  // --- ACCIONES (ACTIONS) ---
+
+  /** Sincroniza el usuario autenticado con el store global. */
   setUser: (user: User | null) => set({ user }),
-  /** Limpia el estado del usuario al cerrar sesión */
+
+  /** Elimina los datos del usuario (útil en Logout). */
   clearUser: () => set({ user: null }),
-  /** Controla el spinner global de carga de sesión */
+
+  /** Cambia el estado del spinner global. */
   setLoading: (isLoading: boolean) => set({ isLoading }),
 }));

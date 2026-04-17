@@ -33,16 +33,20 @@ export function useRealtimeMessages(
     }
 
     /**
-     * Suscripción a Firestore (onSnapshot).
-     * Este listener se activa cada vez que hay un cambio en la colección filtrada.
+     * SUSCRIPCIÓN ACTIVA: Se conecta a Firestore y escucha cambios en la colección.
+     * Retorna una función 'unsubscribe' que detiene la escucha.
      */
     const unsubscribe = subscribeToMessages(userId, conversationId, (msgs: Message[]) => {
       setMessages(msgs);
     });
 
     /**
-     * CLEANUP: Es vital desuscribirse para evitar memory leaks y consumo innecesario
-     * de lecturas en Firebase cuando el componente se desmonta.
+     * CLEANUP (IMPORTANTE): Al retornar 'unsubscribe', React lo ejecutará automáticamente 
+     * cuando el componente se desmonte o cambien las dependencias.
+     * Esto previene:
+     * 1. Memory Leaks: El listener no sigue corriendo en segundo plano.
+     * 2. Billing: Evita lecturas accidentales y costos innecesarios en Firebase.
+     * 3. Errores de Estado: Evita intentar actualizar componentes que ya no existen.
      */
     return () => unsubscribe();
   }, [userId, conversationId, setMessages]);

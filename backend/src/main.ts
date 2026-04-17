@@ -5,25 +5,35 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import type { AppConfig } from './config/configuration';
 
+/**
+ * Punto de entrada principal del Backend Fiboo.
+ * 
+ * QUÉ: Inicializa el servidor NestJS, configura middlewares globales, CORS y validaciones.
+ * POR QUÉ: Es la base de la aplicación donde confluyen todos los módulos y pipes de seguridad.
+ * PROBLEMA QUE RESUELVE: Establece un entorno de ejecución seguro y validado para las peticiones del frontend.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService<AppConfig, true>>(ConfigService);
   const logger = new Logger('Bootstrap');
 
+  // Adaptador para filtros globales de excepciones
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
 
   const frontendUrl = configService.get('frontendUrl', { infer: true });
   const port = configService.get('port', { infer: true });
 
-  // Configuración de CORS permitiendo solo la URL del frontend
+  // --- CONFIGURACIÓN DE SEGURIDAD (CORS) ---
+  // IMPORTANTE: Solo permite peticiones desde la URL del frontend definida en variables de entorno.
   app.enableCors({
     origin: frontendUrl,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  // Validaciones globales para los DTOs
+  // --- VALIDACIÓN GLOBAL ---
+  // Usa ValidationPipe para asegurar que todos los datos entrantes (DTOs) cumplan con los tipos esperados.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware de Next.js para protección de rutas.
+ * Middleware de Next.js para protección de rutas y robustez de URLs (Edge Runtime).
  * 
- * QUÉ: Este middleware intercepta todas las peticiones entrantes.
- * POR QUÉ: Permite centralizar la lógica de autenticación y redirección.
- * PROBLEMA QUE RESUELVE: Evita que usuarios no autenticados accedan a rutas protegidas
- * como /chat, y que usuarios autenticados vuelvan a /login.
+ * QUÉ: Intercepta todas las peticiones antes de que lleguen a las páginas.
+ * POR QUÉ: Permite centralizar la lógica de sesión sin repetir código en cada componente.
+ * PROBLEMA QUE RESUELVE:
+ * 1. Protección perimetral: Evita que el navegador renderice páginas protegidas si no hay sesión.
+ * 2. Corrección de URLs: Redirige automáticamente links de Firebase malformados (trailing dots).
  */
 export function middleware(request: NextRequest) {
   const session = request.cookies.get('__session')?.value;

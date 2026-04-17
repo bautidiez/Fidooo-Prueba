@@ -9,26 +9,35 @@ import type { ChatState, Message } from '@/types/message.types';
  * PROBLEMA QUE RESUELVE: Centraliza la sincronización de mensajes en tiempo real y controla la visibilidad lateral.
  */
 export const useChatStore = create<ChatState>((set) => ({
-  // --- Estado ---
-  /** Lista de mensajes de la conversación activa */
+  // --- ESTADO (STATE) ---
+  
+  /** Lista reactiva de mensajes (sincronizada en tiempo real) */
   messages: [],
-  /** Indica si la IA está procesando una respuesta actualmente */
+
+  /** Estado de 'pensando' de la IA (bloquea el input durante el proceso) */
   isReplying: false,
-  /** ID de la conversación que se está visualizando */
+
+  /** Puntero al documento de la conversación activa en Firestore */
   activeConversationId: null,
-  /** Controla si el sidebar (historial) está desplegado */
+
+  /** Controla el layout responsivo del sidebar lateral */
   isSidebarOpen: true,
 
-  // --- Acciones ---
-  /** Reemplaza la lista completa de mensajes (usado por el listener onSnapshot) */
+  // --- ACCIONES (ACTIONS) ---
+
+  /** Método principal usado por el hook useRealtimeMessages para inyectar datos de Firestore. */
   setMessages: (messages: Message[]) => set({ messages }),
-  /** Agrega un nuevo mensaje individual al final de la lista (optimista) */
+
+  /** Permite añadir un mensaje de forma local antes de que llegue del servidor. */
   addMessage: (message: Message) =>
     set((state) => ({ messages: [...state.messages, message] })),
-  /** Activa/Desactiva el estado de escritura de la IA */
+
+  /** Controla el feedback visual de carga en la burbuja de la IA. */
   setReplying: (isReplying: boolean) => set({ isReplying }),
-  /** Cambia la conversación seleccionada */
+
+  /** Selecciona una conversación diferente del historial. */
   setActiveConversationId: (activeConversationId: string | null) => set({ activeConversationId }),
-  /** Alterna la visibilidad del sidebar */
+
+  /** Toggle de UI para optimización de espacio en pantalla. */
   setSidebarOpen: (isSidebarOpen: boolean) => set({ isSidebarOpen }),
 }));

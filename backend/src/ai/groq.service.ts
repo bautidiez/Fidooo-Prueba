@@ -11,9 +11,11 @@ import type { AppConfig } from '../config/configuration';
 /**
  * Servicio encargado de la comunicación con Groq AI.
  * 
- * QUÉ: Envía mensajes de usuario a los modelos de Llama hospedados en Groq.
- * POR QUÉ: Se eligió Groq sobre OpenAI/Gemini por su velocidad (LPU) y su tier gratuito.
- * VENTAJA TÉCNICA: Inferencia en hardware especializado (LPU) que reduce la latencia drásticamente.
+ * QUÉ: Envía mensajes de usuario a los modelos de Llama hospedados en la infraestructura de Groq.
+ * POR QUÉ: Se eligió Groq porque OpenAI bloquea el acceso si no hay un saldo mínimo de USD 5. 
+ *          Groq ofrece un tier gratuito generoso y es ideal para MVPs y prototipos rápidos.
+ * VENTAJA TÉCNICA: Groq utiliza LPU (Language Processing Units), hardware diseñado específicamente 
+ *                   para LLMs que ofrece una velocidad de inferencia (tokens/seg) mucho mayor a la nube tradicional.
  */
 @Injectable()
 export class GroqService implements OnModuleInit {

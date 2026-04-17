@@ -17,11 +17,14 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
   const { user, isLoading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
-    // Escucha el cambio de estado de autenticación (login, logout, token refresh)
+    /**
+     * OBSERVER DE FIREBASE: onAuthStateChanged.
+     * Escucha activamente cambios en la sesión (Login, Logout, Token Refresh).
+     */
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
       try {
         if (firebaseUser) {
-          // Mapeo del objeto de Firebase a nuestro tipo de dominio User
+          // MAPEO: Convertimos el objeto de Firebase a nuestro tipo de dominio User.
           const user: User = {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
@@ -31,12 +34,13 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
           };
           setUser(user);
         } else {
+          // Si no hay sesión, nos aseguramos de que el store esté limpio.
           setUser(null);
         }
       } catch (error) {
         console.error('Error in onAuthStateChanged:', error);
       } finally {
-        // Una vez que Firebase responde, dejamos de cargar pase lo que pase
+        // FINALIZACIÓN: Dejamos de mostrar el spinner una vez que Firebase responde.
         setLoading(false);
       }
     });

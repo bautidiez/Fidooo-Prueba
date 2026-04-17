@@ -21,6 +21,11 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [verificationSent, setVerificationSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
+  /**
+   * REQUISITOS DE CONTRASEÑA: 
+   * Objeto reactivo que verifica las reglas de seguridad en tiempo real 
+   * mientras el usuario escribe. Facilita el feedback visual inmediato (UX).
+   */
   const passwordRequirements = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
@@ -28,6 +33,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     number: /[0-9]/.test(password),
   };
 
+  /** Indica si la contraseña actual es apta para el registro */
   const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
 
   async function handleSendVerification(user: any) {

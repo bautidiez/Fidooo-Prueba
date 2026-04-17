@@ -8,7 +8,15 @@ import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
 
 type AuthTab = 'login' | 'register' | 'reset';
 
+/**
+ * Página de Autenticación (Login, Registro, Recuperación).
+ * 
+ * QUÉ: Punto de entrada único para la gestión de acceso de usuarios.
+ * POR QUÉ: Centraliza la UI de auth en una sola ruta usando subcomponentes para evitar recargas.
+ * PROBLEMA QUE RESUELVE: Ofrece una experiencia fluida (SPA) para que el usuario gestione su cuenta.
+ */
 export default function LoginPage() {
+  // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
 
   const titles: Record<AuthTab, string> = {
