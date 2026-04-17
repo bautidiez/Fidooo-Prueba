@@ -26,3 +26,6 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db
+
+# Private Notes
+GUIA_ENTREVISTA.md
