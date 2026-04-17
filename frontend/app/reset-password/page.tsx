@@ -40,9 +40,19 @@ function AuthActionContent() {
       return;
     }
 
-    if (mode === 'verifyEmail') {
-      applyActionCode(auth, oobCode)
-        .then(() => {
+    // Usamos onAuthStateChanged para asegurar que el usuario esté cargado antes de aplicar el código
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (mode === 'verifyEmail') {
+        try {
+          await applyActionCode(auth, oobCode);
+          
+          // Si hay un usuario en esta pestaña, forzamos recarga y generamos cookie
+          if (user) {
+            await user.reload();
+            const token = await user.getIdToken(true);
+            document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+          }
+
           setStatus('verified');
           Swal.fire({
             title: '¡Email Verificado!',
@@ -54,22 +64,22 @@ function AuthActionContent() {
           }).then(() => {
             router.push('/chat');
           });
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error('Error verifying email:', err);
           setStatus('invalid');
-        });
-    } else {
-      // Default to reset password
-      verifyPasswordResetCode(auth, oobCode)
-        .then(() => {
-          setStatus('valid');
-        })
-        .catch((err) => {
-          console.error('Invalid or expired code:', err);
-          setStatus('invalid');
-        });
-    }
+        }
+      } else {
+        // Modo reset password
+        verifyPasswordResetCode(auth, oobCode)
+          .then(() => setStatus('valid'))
+          .catch((err) => {
+            console.error('Invalid or expired code:', err);
+            setStatus('invalid');
+          });
+      }
+    });
+
+    return () => unsubscribe();
   }, [oobCode, mode, auth, router]);
 
   async function handleReset(e: React.FormEvent) {

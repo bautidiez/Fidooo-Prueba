@@ -19,22 +19,26 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
   useEffect(() => {
     // Escucha el cambio de estado de autenticación (login, logout, token refresh)
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        // Mapeo del objeto de Firebase a nuestro tipo de dominio User
-        const user: User = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          emailVerified: firebaseUser.emailVerified,
-        };
-        setUser(user);
-      } else {
-        // Si no hay usuario, limpiamos el store
-        setUser(null);
+      try {
+        if (firebaseUser) {
+          // Mapeo del objeto de Firebase a nuestro tipo de dominio User
+          const user: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
+            emailVerified: firebaseUser.emailVerified,
+          };
+          setUser(user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error in onAuthStateChanged:', error);
+      } finally {
+        // Una vez que Firebase responde, dejamos de cargar pase lo que pase
+        setLoading(false);
       }
-      // Una vez que Firebase responde (con user o null), dejamos de cargar
-      setLoading(false);
     });
 
     /**
