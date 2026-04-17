@@ -26,15 +26,31 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
     getRedirectResult(auth)
       .then(async (result) => {
         if (result?.user) {
+          // El usuario se logueó con éxito tras el redirect
           const token = await result.user.getIdToken();
           setSessionCookie(token);
-          // Redirección inmediata tras Google Redirect
+          
+          // Limpiamos la flag de redirección pendiente
+          sessionStorage.removeItem('pendingGoogleRedirect');
+
+          // Redirección inmediata tras Google Redirect si estamos en login
           if (window.location.pathname === '/login') {
             router.push('/chat');
           }
+        } else {
+          // Verificamos si veníamos de un redirect que falló o se canceló
+          const pending = sessionStorage.getItem('pendingGoogleRedirect');
+          if (pending) {
+            sessionStorage.removeItem('pendingGoogleRedirect');
+            console.warn('[useAuth] Se detectó un redirect pendiente pero no se obtuvo resultado del usuario.');
+          }
         }
       })
-      .catch((err) => console.error('[useAuth] Error en Redirect:', err));
+      .catch((err) => {
+        // En caso de error, también limpiamos la flag para no quedar trabados
+        sessionStorage.removeItem('pendingGoogleRedirect');
+        console.error('[useAuth] Error crítico en Redirect de Google:', err);
+      });
 
     /**
      * OBSERVER DE FIREBASE: onAuthStateChanged.

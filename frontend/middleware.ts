@@ -14,12 +14,9 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('__session')?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. Si el usuario intenta acceder al chat sin sesión
-  // DESACTIVADO TEMPORALMENTE: Permite que /chat cargue y useAuth (cliente) verifique la sesión.
-  // Esto evita bucles de redirección infinita en móviles con cookies lentas.
+  // 1. Protección de /chat: Si no hay sesión, mandamos a login
   if (pathname.startsWith('/chat') && !session) {
-    // return NextResponse.redirect(new URL('/login', request.url));
-    console.log('[Middleware] Acceso a /chat sin cookie. Permitiendo paso para verificación en cliente.');
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   // 2. Si el usuario ya tiene sesión e intenta ir a login, redirigir al chat
@@ -38,6 +35,8 @@ export function middleware(request: NextRequest) {
 }
 
 // Configuración de las rutas que el middleware debe interceptar
+// USAMOS UNA NEGACIÓN: Protege todo EXCEPTO /login, /register, /reset-password, /api y assets.
+// Esto permite que el cliente procese el Redirect de Google sin bloqueos del servidor.
 export const config = {
-  matcher: ['/chat/:path*', '/login', '/', '/reset-password.:path*'],
+  matcher: ['/((?!login|register|reset-password|_next|favicon.ico|api|assets).*)'],
 };

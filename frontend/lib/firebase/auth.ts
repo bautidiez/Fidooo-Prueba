@@ -112,6 +112,8 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile) {
+    // Marcamos que hay un redirect pendiente para que el hook useAuth sepa qué esperar
+    sessionStorage.setItem('pendingGoogleRedirect', 'true');
     // En móviles, redirigimos para evitar el bloqueo de popups
     return signInWithRedirect(auth, provider);
   } else {
