@@ -27,6 +27,7 @@ export default function LoginPage() {
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
   const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
+  console.log('[LoginPage] v1.11 - AuthDomain:', auth.config.authDomain);
   console.log('[LoginPage] Estado actual - isProcessingRedirect:', isProcessingRedirect, 'user:', !!user);
 
   /**
@@ -164,7 +165,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.10
+          Powered by ChatGPT • Firebase • Fidooo v1.11
         </p>
       </div>
     </main>

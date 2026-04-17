@@ -10,12 +10,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async redirects() {
+  async rewrites() {
     return [
       {
-        source: '/reset-password.',
-        destination: '/reset-password',
-        permanent: true,
+        source: '/__/auth/:path*',
+        destination: `https://fiboochat.firebaseapp.com/__/auth/:path*`,
+      },
+      {
+        source: '/__/firebase/:path*',
+        destination: `https://fiboochat.firebaseapp.com/__/firebase/:path*`,
       },
     ];
   },
