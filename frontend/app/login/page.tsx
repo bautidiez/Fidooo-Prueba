@@ -27,7 +27,7 @@ export default function LoginPage() {
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
   const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
-  console.log('[LoginPage] v1.22 - Estado:', isProcessingRedirect ? 'Procesando Redirect' : 'Esperando interacción');
+  console.log('[LoginPage] v1.23 - Estado:', isProcessingRedirect ? 'Procesando Redirect' : 'Esperando interacción');
 
   /**
    * MANEJO DE REDIRECCIÓN DE Google (Centralizado):
@@ -175,7 +175,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.22
+          Powered by ChatGPT • Firebase • Fidooo v1.23
         </p>
       </div>
     </main>
