@@ -37,6 +37,8 @@ export default function LoginPage() {
           const token = await result.user.getIdToken();
           // Sincronizar sesión robusta
           setSessionCookie(token);
+          // Pequeño delay de seguridad para móviles
+          await new Promise(r => setTimeout(r, 150));
           window.location.href = '/chat';
         }
       } catch (err) {
@@ -61,7 +63,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-4 md:pt-6 overflow-y-auto pb-8">
+    <main className="relative flex min-h-dvh w-full flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-4 md:pt-6 overflow-y-auto overflow-x-hidden pb-8">
       {/* Background Aurora */}
       <div className="aurora-bg bg-[#1ebbf4] w-[80vw] h-[80vw] -top-[40vw] -left-[40vw]"></div>
       <div className="aurora-bg bg-[#84d6f6] w-[60vw] h-[60vw] top-[20vw] right-[0vw]" style={{ animationDuration: '25s' }}></div>

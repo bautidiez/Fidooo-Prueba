@@ -241,6 +241,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
             const token = await credential.user.getIdToken();
             setSessionCookie(token);
+            // Pequeño delay de seguridad
+            await new Promise(r => setTimeout(r, 150));
             window.location.href = '/chat';
           } catch (err: any) {
             if (err instanceof FirebaseError) {

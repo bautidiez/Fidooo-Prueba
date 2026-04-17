@@ -51,6 +51,8 @@ function AuthActionContent() {
             await user.reload();
             const token = await user.getIdToken(true);
             setSessionCookie(token);
+            // Delay de seguridad
+            await new Promise(r => setTimeout(r, 150));
           }
 
           setStatus('verified');

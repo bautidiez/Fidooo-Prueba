@@ -118,9 +118,8 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
  * POR QUÉ: Los navegadores móviles requieren Secure y SameSite=Lax para persistir sesiones tras redirecciones.
  */
 export function setSessionCookie(token: string): void {
-  // SameSite=Lax es más compatible con el flujo de Redirección de Google en móviles
-  // Secure es obligatorio para Vercel (HTTPS)
-  document.cookie = `__session=${token}; path=/; max-age=3600; Secure; SameSite=Lax; Priority=High`;
+  // SameSite=None + Secure es la configuración más robusta para móviles tras redirecciones
+  document.cookie = `__session=${token}; path=/; max-age=3600; Secure; SameSite=None; Priority=High`;
 }
 
 export { sendEmailVerification, getRedirectResult };
