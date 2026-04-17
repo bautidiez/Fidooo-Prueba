@@ -36,7 +36,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
       const token = await credential.user.getIdToken();
       // Sincronización robusta de sesión
       setSessionCookie(token);
-      router.push('/chat');
+      window.location.href = '/chat';
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
@@ -104,7 +104,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
             const token = await credential.user.getIdToken();
             setSessionCookie(token);
-            router.push('/chat');
+            window.location.href = '/chat';
           } catch (err: any) {
             if (err instanceof FirebaseError) {
               setError(getFirebaseErrorMessage(err.code));

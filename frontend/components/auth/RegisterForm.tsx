@@ -241,7 +241,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
             const token = await credential.user.getIdToken();
             setSessionCookie(token);
-            router.push('/chat');
+            window.location.href = '/chat';
           } catch (err: any) {
             if (err instanceof FirebaseError) {
               setError(getFirebaseErrorMessage(err.code));

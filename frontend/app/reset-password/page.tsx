@@ -62,7 +62,7 @@ function AuthActionContent() {
             color: '#fff',
             confirmButtonColor: '#1ebbf4',
           }).then(() => {
-            router.push('/chat');
+            window.location.href = '/chat';
           });
         } catch (err) {
           console.error('Error verifying email:', err);

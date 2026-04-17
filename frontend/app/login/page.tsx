@@ -37,7 +37,7 @@ export default function LoginPage() {
           const token = await result.user.getIdToken();
           // Sincronizar sesión robusta
           setSessionCookie(token);
-          router.push('/chat');
+          window.location.href = '/chat';
         }
       } catch (err) {
         console.error('Error al procesar el resultado de redirección:', err);
