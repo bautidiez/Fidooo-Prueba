@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getRedirectResult, auth, setSessionCookie } from '@/lib/firebase/auth';
+import { getRedirectResult, auth, setSessionCookie, getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import Swal from 'sweetalert2';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
@@ -41,8 +42,16 @@ export default function LoginPage() {
           await new Promise(r => setTimeout(r, 150));
           router.push('/chat');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error al procesar el resultado de redirección:', err);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error de Autenticación',
+          text: `Google no pudo iniciar sesión: ${err.message || 'Error desconocido'}. Verificá si el dominio está autorizado en Firebase.`,
+          background: '#1c1c1c',
+          color: '#fff',
+          confirmButtonColor: '#1ebbf4'
+        });
       } finally {
         setIsProcessingRedirect(false);
       }
@@ -124,7 +133,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.3
+          Powered by ChatGPT • Firebase • Fidooo v1.4
         </p>
       </div>
     </main>

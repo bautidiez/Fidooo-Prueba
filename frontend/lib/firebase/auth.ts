@@ -105,6 +105,8 @@ export async function checkEmailExists(email: string): Promise<boolean> {
  */
 export async function signInWithGoogle(): Promise<UserCredential | void> {
   const provider = new GoogleAuthProvider();
+  // Forzamos selección de cuenta para evitar que use una sesión previa corrupta
+  provider.setCustomParameters({ prompt: 'select_account' });
   
   // Detección básica de móvil para decidir el flujo de Auth
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

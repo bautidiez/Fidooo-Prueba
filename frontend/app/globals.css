@@ -51,6 +51,15 @@ body {
   100% { transform: rotate(360deg) scale(1) translate(0%, 0%); }
 }
 
+/* 📱 Mobile Form Fixes */
+@media (max-width: 768px) {
+  input, 
+  textarea, 
+  select {
+    font-size: 16px !important; /* Evita que el navegador haga zoom automático al enfocar */
+  }
+}
+
 .aurora-bg {
   position: absolute;
   filter: blur(140px);
