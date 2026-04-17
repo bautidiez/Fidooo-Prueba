@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GeminiService } from '../ai/gemini.service';
 import { GroqService } from '../ai/groq.service';
 import { FirestoreService } from '../firestore/firestore.service';
 
@@ -15,7 +14,6 @@ export class ChatService {
   private readonly logger = new Logger(ChatService.name);
 
   constructor(
-    private readonly geminiService: GeminiService,
     private readonly groqService: GroqService,
     private readonly firestoreService: FirestoreService,
   ) {}

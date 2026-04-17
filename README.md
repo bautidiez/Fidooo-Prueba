@@ -1,5 +1,8 @@
 # 🌀 Fiboo AI Chat — Smart Conversations
 
+> [!IMPORTANT]
+> **GUÍA DE DEFENSA TÉCNICA**: He preparado una guía detallada para la defensa de este proyecto en una entrevista laboral. Podés leerla aquí: **[GUIA_ENTREVISTA.md](./GUIA_ENTREVISTA.md)**
+
 **Fiboo AI Chat** es una plataforma de inteligencia artificial diseñada para ofrecer una experiencia de conversación fluida, rápida y futurista. El sistema está construido con una arquitectura escalable de microservicios, utilizando lo último en tecnología de modelos de lenguaje (LLM).
 
 🚀 **Pruebalo en vivo:** [fidooo-prueba-teal.vercel.app](https://fidooo-prueba-teal.vercel.app)
