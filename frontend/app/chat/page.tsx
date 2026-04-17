@@ -31,8 +31,9 @@ export default function ChatPage() {
    */
   async function handleSignOut(): Promise<void> {
     await signOutUser();
-    // Limpieza de cookie de sesión:
+    // Limpieza de cookie de sesión y almacenamiento local:
     document.cookie = '__session=; path=/; max-age=0';
+    sessionStorage.clear();
     router.push('/login');
   }
 
