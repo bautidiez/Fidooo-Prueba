@@ -28,6 +28,23 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: [
           {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self';",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google-analytics.com https://identitytoolkit.googleapis.com https://*.firebaseapp.com;",
+              "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://*.groq.com;",
+              "frame-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com;",
+              "frame-ancestors 'self';",
+              "img-src 'self' blob: data: https://lh3.googleusercontent.com https://*.firebaseapp.com;",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+              "font-src 'self' https://fonts.gstatic.com;",
+              "base-uri 'self';",
+              "form-action 'self' https://*.firebaseapp.com https://*.googleapis.com;",
+              "upgrade-insecure-requests;",
+              "object-src 'none';"
+            ].join(' ')
+          },
+          {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
           },
@@ -58,6 +75,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Cross-Origin-Resource-Policy',
             value: 'same-site'
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none'
           }
         ],
       },
