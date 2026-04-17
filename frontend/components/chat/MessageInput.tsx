@@ -57,7 +57,7 @@ export function MessageInput({ onSend, isDisabled = false }: MessageInputProps) 
           disabled={isLoading}
           rows={1}
           className="peer w-full resize-none rounded-3xl border border-white/10 bg-white/5 py-4 pl-6 pr-14 
-            text-sm font-medium text-white placeholder-white/30 backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.2)]
+            text-base font-medium text-white placeholder-white/30 backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.2)]
             focus:border-[#1ebbf4]/50 focus:outline-none focus:ring-1 focus:ring-[#1ebbf4]/50 disabled:opacity-50
             transition-all duration-300"
           style={{ minHeight: '56px', maxHeight: '120px' }}

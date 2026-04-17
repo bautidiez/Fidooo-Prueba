@@ -118,7 +118,7 @@ export function Sidebar() {
                 
                 <button
                   onClick={(e) => handleDelete(e, conv.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 text-white/20 transition-all active:scale-90 cursor-pointer"
+                  className="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 text-white/20 transition-all active:scale-90 cursor-pointer"
                   title="Eliminar chat"
                 >
                   <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
