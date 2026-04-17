@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getRedirectResult, auth } from '@/lib/firebase/auth';
+import { getRedirectResult, auth, setSessionCookie } from '@/lib/firebase/auth';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
@@ -35,8 +35,8 @@ export default function LoginPage() {
         if (result) {
           setIsProcessingRedirect(true);
           const token = await result.user.getIdToken();
-          // Sincronizar sesión
-          document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+          // Sincronizar sesión robusta
+          setSessionCookie(token);
           router.push('/chat');
         }
       } catch (err) {

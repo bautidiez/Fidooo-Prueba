@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { confirmPasswordReset, verifyPasswordResetCode, applyActionCode, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { app } from '@/lib/firebase/config';
-import { getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import { getFirebaseErrorMessage, setSessionCookie } from '@/lib/firebase/auth';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import Swal from 'sweetalert2';
@@ -50,7 +50,7 @@ function AuthActionContent() {
           if (user) {
             await user.reload();
             const token = await user.getIdToken(true);
-            document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+            setSessionCookie(token);
           }
 
           setStatus('verified');

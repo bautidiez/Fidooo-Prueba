@@ -112,4 +112,15 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
   }
 }
 
+/**
+ * Sincroniza el token de Firebase con la cookie de sesión (__session).
+ * QUÉ: Guarda el ID Token en el navegador con los flags de seguridad correctos.
+ * POR QUÉ: Los navegadores móviles requieren Secure y SameSite=Lax para persistir sesiones tras redirecciones.
+ */
+export function setSessionCookie(token: string): void {
+  // SameSite=Lax es más compatible con el flujo de Redirección de Google en móviles
+  // Secure es obligatorio para Vercel (HTTPS)
+  document.cookie = `__session=${token}; path=/; max-age=3600; Secure; SameSite=Lax; Priority=High`;
+}
+
 export { sendEmailVerification, getRedirectResult };

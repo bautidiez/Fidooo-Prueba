@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
-import { signIn, getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import { signIn, getFirebaseErrorMessage, setSessionCookie } from '@/lib/firebase/auth';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -34,8 +34,8 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
     try {
       const credential = await signIn(email, password);
       const token = await credential.user.getIdToken();
-      // Set cookie for middleware
-      document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+      // Sincronización robusta de sesión
+      setSessionCookie(token);
       router.push('/chat');
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -103,7 +103,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
             if (!credential) return;
 
             const token = await credential.user.getIdToken();
-            document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+            setSessionCookie(token);
             router.push('/chat');
           } catch (err: any) {
             if (err instanceof FirebaseError) {

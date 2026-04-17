@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
-import { signUp, getFirebaseErrorMessage } from '@/lib/firebase/auth';
+import { signUp, getFirebaseErrorMessage, setSessionCookie } from '@/lib/firebase/auth';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -240,7 +240,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             if (!credential) return;
 
             const token = await credential.user.getIdToken();
-            document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+            setSessionCookie(token);
             router.push('/chat');
           } catch (err: any) {
             if (err instanceof FirebaseError) {
