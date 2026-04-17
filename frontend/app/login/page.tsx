@@ -22,38 +22,61 @@ type AuthTab = 'login' | 'register' | 'reset';
 export default function LoginPage() {
   const router = useRouter();
   // Enganchamos el hook de auth para capturar redirecciones automáticamente
-  useAuth();
+  const { user } = useAuth();
 
   /**
-   * MANEJO DE REDIRECCIÓN DE GOOGLE (Centralizado):
+   * MANEJO DE REDIRECCIÓN DE Google (Centralizado):
    * Captura el resultado si venimos de un Redirect de Google y controla el Spinner local.
    */
   useEffect(() => {
     const pending = sessionStorage.getItem('pendingGoogleRedirect');
-    if (!pending) return; // Si no hay redirect pendiente, no hacemos nada
+    if (!pending) return;
 
     setIsProcessingRedirect(true);
 
+    // SEGURIDAD: Timeout de 8 segundos para evitar spinner infinito si getRedirectResult falla
+    const timeout = setTimeout(() => {
+      if (sessionStorage.getItem('pendingGoogleRedirect')) {
+        console.warn('[LoginPage] Redirect de Google excedió el tiempo de espera. Forzando cierre de spinner.');
+        sessionStorage.removeItem('pendingGoogleRedirect');
+        setIsProcessingRedirect(false);
+      }
+    }, 8000);
+
     getRedirectResult(auth)
       .then(async (result) => {
+        clearTimeout(timeout);
         if (result?.user) {
-          // Éxito: Sincronizamos cookie y navegamos al chat
           const token = await result.user.getIdToken();
           setSessionCookie(token);
           sessionStorage.removeItem('pendingGoogleRedirect');
           router.push('/chat');
         } else {
-          // Caso en que Google vuelve pero no hay usuario (ej: volvió a entrar solo)
           sessionStorage.removeItem('pendingGoogleRedirect');
           setIsProcessingRedirect(false);
         }
       })
       .catch((err) => {
+        clearTimeout(timeout);
         console.error('[LoginPage] Error en redirect de Google:', err);
         sessionStorage.removeItem('pendingGoogleRedirect');
         setIsProcessingRedirect(false);
       });
+
+    return () => clearTimeout(timeout);
   }, [router]);
+
+  /**
+   * FALLBACK DE SEGURIDAD: Si useAuth detecta sesión mientras estamos en el spinner,
+   * forzamos la entrada al chat aunque getRedirectResult no haya terminado.
+   */
+  useEffect(() => {
+    if (user && isProcessingRedirect) {
+      console.log('[LoginPage] Sesión detectada vía Hook. Redirigiendo al chat por fallback.');
+      sessionStorage.removeItem('pendingGoogleRedirect');
+      router.push('/chat');
+    }
+  }, [user, isProcessingRedirect, router]);
   
   // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
@@ -139,7 +162,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-[9px] uppercase tracking-widest text-white/30 font-medium">
-          Powered by ChatGPT • Firebase • Fidooo v1.8
+          Powered by ChatGPT • Firebase • Fidooo v1.9
         </p>
       </div>
     </main>

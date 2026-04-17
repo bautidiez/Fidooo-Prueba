@@ -13,10 +13,22 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        // Esta regla captura el link con punto final y lo limpia para evitar el 404
         source: '/reset-password.',
         destination: '/reset-password',
         permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com; object-src 'none';"
+          }
+        ],
       },
     ];
   },
