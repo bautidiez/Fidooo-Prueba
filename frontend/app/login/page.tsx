@@ -23,6 +23,10 @@ export default function LoginPage() {
   const router = useRouter();
   // Enganchamos el hook de auth para capturar redirecciones automáticamente
   const { user } = useAuth();
+  
+  // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
+  const [activeTab, setActiveTab] = useState<AuthTab>('login');
+  const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
 
   /**
    * MANEJO DE REDIRECCIÓN DE Google (Centralizado):
@@ -78,10 +82,7 @@ export default function LoginPage() {
     }
   }, [user, isProcessingRedirect, router]);
   
-  // ESTADO: Maneja la vista activa ('login', 'register' o 'reset')
-  const [activeTab, setActiveTab] = useState<AuthTab>('login');
-  const [isProcessingRedirect, setIsProcessingRedirect] = useState(false);
-
+  
   /**
    * MANEJO DE REDIRECCIÓN DE GOOGLE (Móvil):
    * Este efecto corre al cargar la página. Si venimos de un Redirect de Google,
