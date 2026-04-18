@@ -54,7 +54,7 @@ export class GroqService implements OnModuleInit {
     }
   }
 
-  async generateReply(userMessage: string): Promise<string> {
+  async generateReply(messages: Array<{ role: string, content: string }>): Promise<string> {
     if (this.isMockMode || !this.client) {
       throw new Error('Groq no está configurado.');
     }
@@ -65,12 +65,9 @@ export class GroqService implements OnModuleInit {
         messages: [
           {
             role: 'system',
-            content: 'Sos un asistente inteligente de Fiboo. Respondé siempre en el idioma del usuario de forma útil.',
+            content: 'Sos un asistente inteligente de Fiboo. Respondé siempre en el idioma del usuario de forma útil. Usá Markdown (negrita, cursiva) para resaltar puntos importantes, esto es vital para la legibilidad en móviles.',
           },
-          {
-            role: 'user',
-            content: userMessage,
-          },
+          ...messages as any,
         ],
         max_tokens: 1024,
       });

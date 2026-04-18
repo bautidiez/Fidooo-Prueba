@@ -67,4 +67,31 @@ export class FirestoreService {
 
     this.logger.debug(`Mensaje guardado [${role}] en la conversación ${conversationId}`);
   }
+
+  /**
+   * Obtiene los últimos mensajes de una conversación para dar contexto a la IA.
+   * 
+   * @param {string} userId - ID del usuario.
+   * @param {string} conversationId - ID de la conversación.
+   * @param {number} limit - Cantidad máxima de mensajes a recuperar.
+   * @returns {Promise<any[]>} Lista de mensajes formateados.
+   */
+  async getMessages(userId: string, conversationId: string, limit: number = 10): Promise<any[]> {
+    const messagesRef = this.firebaseService.firestore
+      .collection('chats')
+      .doc(userId)
+      .collection('conversations')
+      .doc(conversationId)
+      .collection('messages');
+
+    const snapshot = await messagesRef
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .get();
+
+    // Revertimos el orden para que lleguen cronológicamente (más antiguo primero) a la IA
+    return snapshot.docs
+      .map(doc => doc.data())
+      .reverse();
+  }
 }

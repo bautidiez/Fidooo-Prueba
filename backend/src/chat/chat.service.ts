@@ -30,10 +30,22 @@ export class ChatService {
     this.logger.debug(`Procesando mensaje en conv: ${conversationId} de usuario: ${userId}`);
     let reply: string | null = null;
 
-    // 1. Intentar con Groq (El más estable gratis y ridículamente rápido)
+    // 1. Obtener historial previo para dar memoria a la IA
+    const history = await this.firestoreService.getMessages(userId, conversationId, 10);
+    
+    // Mapeamos al formato que espera Groq (OpenAI Compatible)
+    const formattedHistory = history.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Añadimos el mensaje actual del usuario al contexto
+    formattedHistory.push({ role: 'user', content: message });
+
+    // 2. Intentar con Groq enviando todo el contexto
     try {
-      reply = await this.groqService.generateReply(message);
-      this.logger.log('Respuesta generada con Groq');
+      reply = await this.groqService.generateReply(formattedHistory);
+      this.logger.log('Respuesta generada con Groq (con memoria)');
     } catch (e: any) {
       this.logger.error(`Falla crítica en Groq: ${e.message}`);
       throw new Error(`Error en Groq (IA): ${e.message}. Verificá tu cuota.`);
