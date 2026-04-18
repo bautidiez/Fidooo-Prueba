@@ -171,10 +171,13 @@ export function setSessionCookie(token: string): void {
  * mejorar la compatibilidad en móviles y asegurar el redireccionamiento.
  */
 export async function sendCustomEmailVerification(user: any): Promise<void> {
+  // Preferimos usar el dominio oficial de producción para mayor confiabilidad en filtros de SPAM
+  const domain = window.location.hostname === 'localhost' 
+    ? window.location.origin 
+    : 'https://fidooo-prueba.vercel.app';
+
   const actionCodeSettings = {
-    // La URL a la que el usuario será redirigido después de la verificación exitosa 
-    // (si el template de Firebase lo permite) o el link base que Firebase usará.
-    url: `${window.location.origin}/verify-email`,
+    url: `${domain}/verify-email`,
     handleCodeInApp: true,
   };
   
