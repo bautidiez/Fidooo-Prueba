@@ -37,11 +37,27 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
       // Pequeño delay de seguridad para asegurar que el navegador escriba la cookie
       await new Promise(r => setTimeout(r, 200));
       router.push('/chat');
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof FirebaseError) {
-        setError(getFirebaseErrorMessage(err.code));
+        if (err.code === 'auth/invalid-credential') {
+          // Si el error es genérico, intentamos ser más específicos comprobando si el email existe
+          try {
+            const { checkEmailExists } = await import('@/lib/firebase/auth');
+            const exists = await checkEmailExists(email);
+            if (!exists) {
+              setError('Este email no está registrado.');
+            } else {
+              setError('Contraseña incorrecta. Intentá de nuevo.');
+            }
+          } catch (checkErr) {
+            // Si el check falla por red (ej: backend offline), volvemos al genérico
+            setError(getFirebaseErrorMessage(err.code));
+          }
+        } else {
+          setError(getFirebaseErrorMessage(err.code));
+        }
       } else {
-        setError('Ocurrió un error inesperado.');
+        setError('Ocurrió un error inesperado. Revisá tu conexión.');
       }
     } finally {
       setIsLoading(false);

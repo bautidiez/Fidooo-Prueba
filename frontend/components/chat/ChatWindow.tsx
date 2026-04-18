@@ -108,17 +108,25 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       // Se maneja a través del listener onSnapshot de Firestore en el hook useRealtimeMessages.
     } catch (error: any) {
       console.error('Error sending message:', error);
-      const errorMessage = error.message || 'Error de conexión / Permisos';
+      
+      let errorMessage = error.message || 'Error de conexión / Permisos';
+      
+      // Detección específica de errores de red (Fetch failed)
+      const isFetchError = error instanceof TypeError || errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch');
+      
+      if (isFetchError) {
+        errorMessage = 'No se pudo conectar con Fidooo AI. Verificá tu conexión o la configuración del servidor (NEXT_PUBLIC_BACKEND_URL).';
+      }
       
       // Fallback: Mostrar el error como un mensaje del asistente para mejorar la UX:
       if (activeConversationId) {
         try {
           await addMessage(userId, activeConversationId, `⚠️ Error: ${errorMessage}`, 'assistant');
         } catch (e) {
-          Swal.fire({ title: 'Falla Crítica', text: errorMessage, icon: 'error' });
+          Swal.fire({ title: 'Falla de Conexión', text: errorMessage, icon: 'error' });
         }
       } else {
-        Swal.fire({ title: 'Falla Crítica', text: errorMessage, icon: 'error' });
+        Swal.fire({ title: 'Falla de Conexión', text: errorMessage, icon: 'error' });
       }
     } finally {
       setReplying(false);

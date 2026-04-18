@@ -32,8 +32,8 @@ export const FIREBASE_AUTH_ERRORS: Record<string, string> = {
   'auth/email-already-in-use': 'Este email ya está registrado.',
   'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
   'auth/invalid-email': 'El email no tiene un formato válido.',
-  'auth/too-many-requests': 'Demasiados intentos. Esperá un momento e intentá de nuevo.',
-  'auth/network-request-failed': 'Error de red. Verificá tu conexión a internet.',
+  'auth/too-many-requests': 'Demasiados intentos. Esperá un momento o restablecé tu contraseña.',
+  'auth/network-request-failed': 'Error de conexión. Verificá tu internet y el estado del servidor.',
 };
 
 export function getFirebaseErrorMessage(code: string): string {
