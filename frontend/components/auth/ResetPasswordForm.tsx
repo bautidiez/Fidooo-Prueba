@@ -56,11 +56,11 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
         });
       }, 1000);
 
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
       } else {
-        setError(err.message || 'Ocurrió un error inesperado. Revisá tu conexión.');
+        setError(err?.message || 'Ocurrió un error inesperado. Revisá tu conexión.');
       }
     } finally {
       setIsLoading(false);
