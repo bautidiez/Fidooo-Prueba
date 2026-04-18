@@ -135,6 +135,14 @@ export function ChatWindow({ userId }: ChatWindowProps) {
     }
   }
 
+  // Proactive skeleton cleanup: If the last message is from the assistant, we are no longer replying.
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === 'assistant' && isReplying) {
+      setReplying(false);
+    }
+  }, [messages, isReplying, setReplying]);
+
   return (
     <div className="flex h-full flex-col relative">
       {/* Background Watermark */}
@@ -175,10 +183,9 @@ export function ChatWindow({ userId }: ChatWindowProps) {
                 userPhotoURL={message.role === 'user' ? userPhotoURL : null}
                 userInitials={userInitials}
                 animate={index === messages.length - 1 && message.role === 'assistant'}
-
               />
             ))}
-            {isReplying && messages[messages.length - 1]?.role !== 'assistant' && <MessageBubbleSkeleton />}
+            {isReplying && <MessageBubbleSkeleton />}
             <div ref={bottomRef} />
           </div>
         )}
