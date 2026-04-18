@@ -185,7 +185,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
                 animate={index === messages.length - 1 && message.role === 'assistant'}
               />
             ))}
-            {isReplying && <MessageBubbleSkeleton />}
+            {isReplying && messages[messages.length - 1]?.role !== 'assistant' && <MessageBubbleSkeleton />}
             <div ref={bottomRef} />
           </div>
         )}
