@@ -7,15 +7,23 @@
   USO: Se definen en :root para evitar advertencias de "Unknown at rule @theme" en el IDE, 
   pero se envuelven en @theme para que Tailwind las registre como tokens (ej: bg-fidooo-primary).
 */
-@layer theme {
-  @theme {
+@layer base {
+  :root {
     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    
-    /* Gradiente Fidooo (Tomado del logo) */
     --color-fidooo-primary: #1ebbf4;
     --color-fidooo-secondary: #84d6f6;
     --color-fidooo-tertiary: #c2ebfa;
     --color-fidooo-bg: #1c1c1c;
+  }
+}
+
+@media all {
+  @theme {
+    --font-sans: var(--font-sans);
+    --color-fidooo-primary: var(--color-fidooo-primary);
+    --color-fidooo-secondary: var(--color-fidooo-secondary);
+    --color-fidooo-tertiary: var(--color-fidooo-tertiary);
+    --color-fidooo-bg: var(--color-fidooo-bg);
   }
 }
 
