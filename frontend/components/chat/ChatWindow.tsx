@@ -83,7 +83,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
       if (!idToken) throw new Error('Sesión inválida.');
 
       // 4. Llamada al Backend NestJS
-      await fetch(`${BACKEND_URL}/chat`, {
+      const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,9 +92,14 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         body: JSON.stringify({ message: content, conversationId: currentConvId }),
       });
 
+      if (!response.ok) throw new Error('Error en la respuesta de la IA.');
+
+      // NOTA: No quitamos el cargando aquí. El useEffect más abajo lo hará 
+      // en cuanto detecte el mensaje real en Firestore.
     } catch (error: any) {
       console.error('Error en ChatWindow:', error);
       Swal.fire({ title: 'Error', text: error.message, icon: 'error' });
+      setReplying(false); // Liberamos solo en caso de error real
     }
   }
 
@@ -147,6 +152,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
             ))}
             
             {/* ESQUELETO DE CARGA: Sólo si estamos esperando y el último no es todavía la IA */}
+            {/* ESQUELETO UNIFICADO: Solo se muestra si no hay un mensaje de asistente al final */}
             {isReplying && messages[messages.length - 1]?.role !== 'assistant' && (
               <MessageBubbleSkeleton />
             )}

@@ -34,8 +34,8 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
   return (
     <div
       className={`flex w-full gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-2`}
-      // Animación suave de entrada de la burbuja completa
-      style={{ animation: 'slideIn 0.3s ease-out forwards' }}
+      // Animación suave de entrada: combina deslizamiento y opacidad para un efecto premium
+      style={{ animation: 'messageAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
     >
       {/* SECCIÓN: AVATAR / LOGO */}
       <div
