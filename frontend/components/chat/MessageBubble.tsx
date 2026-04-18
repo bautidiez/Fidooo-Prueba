@@ -64,13 +64,15 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
         }`}
       >
         {animate && message.role === 'assistant' ? (
-          <Typewriter text={message.content} speed={10}>
+          <Typewriter text={message.content} speed={25}>
+
             {(partialText) => (
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
                   p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
-                  strong: ({ children }) => <strong className="font-bold text-[#1ebbf4] drop-shadow-[0_0_8px_rgba(30,187,244,0.3)] bg-[#1ebbf4]/5 px-1 rounded-sm">{children}</strong>,
+                  strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
+
                   em: ({ children }) => <em className="italic text-white underline decoration-[#1ebbf4]/40 underline-offset-4">{children}</em>,
                   ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
                   ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
@@ -86,7 +88,8 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
             remarkPlugins={[remarkGfm]}
             components={{
               p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
-              strong: ({ children }) => <strong className="font-bold text-[#1ebbf4] drop-shadow-[0_0_8px_rgba(30,187,244,0.3)] bg-[#1ebbf4]/5 px-1 rounded-sm">{children}</strong>,
+              strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
+
               em: ({ children }) => <em className="italic text-white underline decoration-[#1ebbf4]/40 underline-offset-4">{children}</em>,
               ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
               ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,

@@ -174,7 +174,13 @@ export function ChatWindow({ userId }: ChatWindowProps) {
                 message={message} 
                 userPhotoURL={message.role === 'user' ? userPhotoURL : null}
                 userInitials={userInitials}
-                animate={index === messages.length - 1 && message.role === 'assistant'}
+                animate={
+                  index === messages.length - 1 && 
+                  message.role === 'assistant' && 
+                  // Evitamos animar mensajes viejos al cargar historial (dentro de los últimos 30s)
+                  (message.createdAt ? (Date.now() - message.createdAt.toDate().getTime() < 30000) : true)
+                }
+
               />
             ))}
             {isReplying && <MessageBubbleSkeleton />}
