@@ -23,11 +23,6 @@ if (BACKEND_URL && !BACKEND_URL.startsWith('http')) {
 }
 BACKEND_URL = BACKEND_URL.replace(/\/$/, ''); // Quitar barra final si existe
 
-console.log(`[Chat] Using Backend URL: ${BACKEND_URL}`);
-if (BACKEND_URL.includes('localhost') && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-  console.warn('[Chat] WARNING: Using localhost backend on a non-localhost frontend. This will likely cause "Failed to fetch".');
-}
-
 /**
  * Ventana principal de mensajes del chat.
  * 
