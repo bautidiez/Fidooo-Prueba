@@ -23,6 +23,7 @@ export function Typewriter({ text, speed = 20, delay = 0, onComplete, children }
 
   useEffect(() => {
     // Reset si el texto cambia (nueva respuesta)
+    console.log(`[Typewriter] Iniciando animación para texto de largo: ${text.length}`);
     setDisplayText('');
     setCurrentIndex(0);
   }, [text]);

@@ -64,7 +64,8 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
         }`}
       >
         {animate && message.role === 'assistant' ? (
-          <Typewriter text={message.content} speed={25}>
+          <Typewriter text={message.content} speed={30}>
+
 
             {(partialText) => (
               <ReactMarkdown 
