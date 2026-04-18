@@ -60,7 +60,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
       if (err instanceof FirebaseError) {
         setError(getFirebaseErrorMessage(err.code));
       } else {
-        setError('Ocurrió un error inesperado.');
+        setError(err.message || 'Ocurrió un error inesperado. Revisá tu conexión.');
       }
     } finally {
       setIsLoading(false);

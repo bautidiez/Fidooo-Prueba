@@ -89,12 +89,15 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     const data = await response.json();
     return data.registered === true;
   } catch (error: any) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      console.error('[Auth] Network error: No se pudo conectar al backend. ¿Está bien configurada la IP en .env?', error);
-    } else {
-      console.error('[Auth] Error checking email:', error);
+    const isNetworkError = error.name === 'TypeError' || error.message.includes('fetch');
+    
+    if (isNetworkError) {
+      console.error('[Auth] Error de conexión al backend:', error);
+      throw new Error('No se pudo verificar el email. Problema de conexión con el servidor (BACKEND_URL).');
     }
-    return true; 
+    
+    console.error('[Auth] Error checking email:', error);
+    return true; // En otros errores (parsing, etc), somos conservadores
   }
 }
 
