@@ -14,9 +14,18 @@ function VerifyEmailContent() {
   const auth = getAuth(app);
   
   const oobCode = searchParams.get('oobCode');
+  const mode = searchParams.get('mode');
   const [status, setStatus] = useState<'loading' | 'success' | 'invalid'>('loading');
 
   useEffect(() => {
+    // DESPACHADOR INTELIGENTE:
+    // Si el modo es 'resetPassword', redirigimos al usuario a la página correcta.
+    // Esto permite que el mismo URL en la consola de Firebase sirva para ambas funciones.
+    if (mode === 'resetPassword') {
+      router.push(`/reset-password?${searchParams.toString()}`);
+      return;
+    }
+
     if (!oobCode) {
       setStatus('invalid');
       return;
@@ -40,7 +49,7 @@ function VerifyEmailContent() {
         console.error('Error verifying email:', err);
         setStatus('invalid');
       });
-  }, [oobCode, auth, router]);
+  }, [oobCode, mode, auth, router, searchParams]);
 
   if (status === 'loading') {
     return (
