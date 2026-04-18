@@ -64,9 +64,23 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
         }`}
       >
         {animate && message.role === 'assistant' ? (
-          <div className="prose prose-invert max-w-none">
-             <Typewriter text={message.content} speed={10} />
-          </div>
+          <Typewriter text={message.content} speed={10}>
+            {(partialText) => (
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
+                  strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
+                  em: ({ children }) => <em className="italic text-white/90 underline decoration-[#1ebbf4]/30 underline-offset-2">{children}</em>,
+                  ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
+                  code: ({ children }) => <code className="bg-white/10 px-1 rounded text-[#1ebbf4] font-mono text-sm">{children}</code>,
+                }}
+              >
+                {partialText}
+              </ReactMarkdown>
+            )}
+          </Typewriter>
         ) : (
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]}

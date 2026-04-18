@@ -5,7 +5,9 @@ import { useState, useEffect } from 'react';
 interface TypewriterProps {
   text: string;
   speed?: number;
+  delay?: number;
   onComplete?: () => void;
+  children?: (text: string) => React.ReactNode;
 }
 
 /**
@@ -13,14 +15,14 @@ interface TypewriterProps {
  * 
  * QUÉ: Muestra texto letra por letra.
  * POR QUÉ: Produce un efecto visual de "IA escribiendo" que mejora la experiencia del usuario.
- * PROBLEMA QUE RESUELVE: Evita el despliegue brusco del texto largo.
+ * PROBLEMA QUE RESUELVE: Evita el despliegue brusco del texto largo y permite renderizado dinámico (Markdown).
  */
-export function Typewriter({ text, speed = 20, onComplete }: TypewriterProps) {
+export function Typewriter({ text, speed = 20, delay = 0, onComplete, children }: TypewriterProps) {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    // Si el texto cambia radicalmente (nuevo mensaje), reseteamos
+    // Reset si el texto cambia (nueva respuesta)
     setDisplayText('');
     setCurrentIndex(0);
   }, [text]);
@@ -37,6 +39,10 @@ export function Typewriter({ text, speed = 20, onComplete }: TypewriterProps) {
       onComplete();
     }
   }, [currentIndex, text, speed, onComplete]);
+
+  if (children) {
+    return <>{children(displayText)}</>;
+  }
 
   return <span>{displayText}</span>;
 }
