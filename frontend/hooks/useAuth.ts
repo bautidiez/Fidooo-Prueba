@@ -23,7 +23,9 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
      * OBSERVER DE FIREBASE: onAuthStateChanged.
      * Escucha activamente cambios en la sesión (Login, Logout, Token Refresh).
      */
+    console.log('[useAuth] Iniciando observer onAuthStateChanged...');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      console.log(`[useAuth] Cambio de estado: ${firebaseUser ? 'USUARIO_PRESENTE (' + firebaseUser.uid + ')' : 'SIN_SESION'}`);
       try {
         if (firebaseUser) {
           // MAPEO: Convertimos el objeto de Firebase a nuestro tipo de dominio User.
@@ -40,6 +42,7 @@ export function useAuth(): { user: User | null; isLoading: boolean } {
           // Aseguramos que la cookie esté siempre presente para el Middleware.
           const token = await firebaseUser.getIdToken();
           setSessionCookie(token);
+          console.log('[useAuth] Sesión sincronizada con éxito.');
         } else {
           // Si no hay sesión, nos aseguramos de que el store esté limpio.
           setUser(null);

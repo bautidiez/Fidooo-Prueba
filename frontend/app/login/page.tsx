@@ -37,16 +37,24 @@ export default function LoginPage() {
     const pending = sessionStorage.getItem('pendingGoogleRedirect');
     if (!pending) return;
 
-    setIsProcessingRedirect(true);
+      console.log('[LoginPage] Iniciando verificación de Redirect de Google...');
+      setIsProcessingRedirect(true);
+  
+      // SEGURIDAD: Timeout reducido a 5 segundos para móviles
+      const timeout = setTimeout(() => {
+        if (sessionStorage.getItem('pendingGoogleRedirect')) {
+          console.warn('[LoginPage] Timeout: El redirect no respondió a tiempo. Liberando UI...');
+          sessionStorage.removeItem('pendingGoogleRedirect');
+          setIsProcessingRedirect(false);
+          
+          // Si ya hay usuario (detectado por useAuth), entramos igual
+          if (user) {
+            console.log('[LoginPage] Timeout con usuario presente. Redirigiendo...');
+            router.push('/chat');
+          }
+        }
+      }, 5000);
 
-    // SEGURIDAD: Timeout de 8 segundos para evitar spinner infinito si getRedirectResult falla
-    const timeout = setTimeout(() => {
-      if (sessionStorage.getItem('pendingGoogleRedirect')) {
-        console.warn('[LoginPage] Redirect de Google excedió el tiempo de espera. Forzando cierre de spinner.');
-        sessionStorage.removeItem('pendingGoogleRedirect');
-        setIsProcessingRedirect(false);
-      }
-    }, 8000);
 
     getRedirectResult(auth)
       .then(async (result) => {
@@ -141,7 +149,15 @@ export default function LoginPage() {
           {isProcessingRedirect ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12">
               <div className="size-12 rounded-full border-4 border-[#1ebbf4]/20 border-t-[#1ebbf4] animate-spin"></div>
-              <p className="text-sm text-white/50 font-medium">Iniciando sesión...</p>
+              <p className="text-sm text-white/50 font-medium tracking-tight">Iniciando sesión...</p>
+              
+              {/* Botón de escape si se queda trabado */}
+              <button 
+                onClick={() => router.push('/chat')}
+                className="mt-4 text-[10px] uppercase tracking-widest text-[#1ebbf4] hover:underline cursor-pointer opacity-40 hover:opacity-100 transition-opacity"
+              >
+                ¿Tarda mucho? Clic acá para entrar
+              </button>
             </div>
           ) : (
             <>

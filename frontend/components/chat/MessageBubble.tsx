@@ -1,12 +1,16 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Typewriter } from '@/components/ui/Typewriter';
 import type { Message } from '@/types/message.types';
+
 
 interface MessageBubbleProps {
   message: Message;
   userPhotoURL?: string | null;
   userInitials?: string;
+  animate?: boolean;
 }
+
 
 function formatTime(createdAt: Message['createdAt']): string {
   if (!createdAt || !('toDate' in createdAt)) return '';
@@ -21,7 +25,8 @@ function formatTime(createdAt: Message['createdAt']): string {
  * POR QUÉ: Centraliza el estilo y la lógica de renderizado según el rol (user/assistant).
  * PROBLEMA QUE RESUELVE: Maneja el formato de texto y la alineación responsiva de los mensajes.
  */
-export function MessageBubble({ message, userPhotoURL, userInitials }: MessageBubbleProps) {
+export function MessageBubble({ message, userPhotoURL, userInitials, animate }: MessageBubbleProps) {
+
   const isUser = message.role === 'user';
 
   return (
@@ -58,19 +63,26 @@ export function MessageBubble({ message, userPhotoURL, userInitials }: MessageBu
             : 'rounded-tl-sm border border-[#1ebbf4]/20 bg-gradient-to-br from-[#1ebbf4]/10 to-[#84d6f6]/5 text-white/90 shadow-[0_0_15px_rgba(30,187,244,0.1)]'
         }`}
       >
-        <ReactMarkdown 
-          remarkPlugins={[remarkGfm]}
-          components={{
-            p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
-            strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
-            em: ({ children }) => <em className="italic text-white/90 underline decoration-[#1ebbf4]/30 underline-offset-2">{children}</em>,
-            ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
-            ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
-            code: ({ children }) => <code className="bg-white/10 px-1 rounded text-[#1ebbf4] font-mono text-sm">{children}</code>,
-          }}
-        >
-          {message.content}
-        </ReactMarkdown>
+        {animate && message.role === 'assistant' ? (
+          <div className="prose prose-invert max-w-none">
+             <Typewriter text={message.content} speed={10} />
+          </div>
+        ) : (
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
+              strong: ({ children }) => <strong className="font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{children}</strong>,
+              em: ({ children }) => <em className="italic text-white/90 underline decoration-[#1ebbf4]/30 underline-offset-2">{children}</em>,
+              ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
+              ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
+              code: ({ children }) => <code className="bg-white/10 px-1 rounded text-[#1ebbf4] font-mono text-sm">{children}</code>,
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
+
         <span
           className={`mt-2 block text-right text-[10px] uppercase tracking-wider font-semibold ${isUser ? 'text-white/40' : 'text-[#1ebbf4]/70'}`}
         >

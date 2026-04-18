@@ -117,13 +117,15 @@ export async function signInWithGoogle(): Promise<UserCredential | void> {
   // Detección de móvil o modo incógnito/restringido
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   
-  console.log(`[Auth] Iniciando Google Login. Modo sugerido: ${isMobile ? 'REDIRECT' : 'POPUP'}`);
+  console.log(`[Auth] Iniciando Google Login. Plataforma detectada: ${navigator.userAgent}. Modo sugerido: ${isMobile ? 'REDIRECT' : 'POPUP'}`);
 
   if (isMobile) {
     // Marcamos que hay un redirect pendiente para que el hook useAuth sepa qué esperar
+    console.log('[Auth] Ejecutando signInWithRedirect...');
     sessionStorage.setItem('pendingGoogleRedirect', 'true');
     return signInWithRedirect(auth, provider);
   } else {
+
     try {
       // Intentamos popup en escritorio para mejor UX
       return await signInWithPopup(auth, provider);

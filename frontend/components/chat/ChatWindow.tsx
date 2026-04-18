@@ -168,12 +168,13 @@ export function ChatWindow({ userId }: ChatWindowProps) {
         </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <MessageBubble 
                 key={message.id} 
                 message={message} 
                 userPhotoURL={message.role === 'user' ? userPhotoURL : null}
                 userInitials={userInitials}
+                animate={index === messages.length - 1 && message.role === 'assistant'}
               />
             ))}
             {isReplying && <MessageBubbleSkeleton />}
