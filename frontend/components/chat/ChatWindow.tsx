@@ -152,9 +152,9 @@ export function ChatWindow({ userId }: ChatWindowProps) {
             ))}
             
             {/* ESQUELETO DE CARGA: Sólo si estamos esperando y el último no es todavía la IA */}
-            {/* ESQUELETO UNIFICADO: Solo se muestra si no hay un mensaje de asistente al final */}
+            {/* ESQUELETO UNIFICADO: Solo se muestra si estamos en turno de respuesta y la IA aún no ha aparecido al final */}
             {isReplying && messages[messages.length - 1]?.role !== 'assistant' && (
-              <MessageBubbleSkeleton />
+              <MessageBubbleSkeleton key="thinking-dots" />
             )}
             
             <div ref={bottomRef} />

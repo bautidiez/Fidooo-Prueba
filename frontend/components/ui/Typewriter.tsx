@@ -12,14 +12,14 @@ interface TypewriterProps {
 
 export function Typewriter({ text, speed = 40, delay = 0, onComplete, children }: TypewriterProps) {
   const [displayText, setDisplayText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
   const requestRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
+  const currentIndexRef = useRef<number>(0);
 
   // EFECTO DE REINICIO TOTAL: Si el texto cambia, reseteamos todo inmediatamente
   useEffect(() => {
     setDisplayText('');
-    setCurrentIndex(0);
+    currentIndexRef.current = 0;
     startTimeRef.current = 0;
   }, [text]);
 
@@ -27,12 +27,12 @@ export function Typewriter({ text, speed = 40, delay = 0, onComplete, children }
     if (!startTimeRef.current) startTimeRef.current = time;
     const elapsed = time - startTimeRef.current;
 
-    // Calculamos cuántos caracteres deberíamos haber mostrado según el tiempo transcurrido
-    const targetIndex = Math.floor(elapsed / speed);
+    // Calculamos el índice objetivo basado en el tiempo transcurrido
+    const targetIndex = Math.min(Math.floor(elapsed / speed), text.length);
 
-    if (targetIndex > currentIndex && targetIndex <= text.length) {
+    if (targetIndex > currentIndexRef.current) {
+      currentIndexRef.current = targetIndex;
       setDisplayText(text.slice(0, targetIndex));
-      setCurrentIndex(targetIndex);
     }
 
     if (targetIndex < text.length) {
@@ -40,7 +40,7 @@ export function Typewriter({ text, speed = 40, delay = 0, onComplete, children }
     } else if (onComplete) {
       onComplete();
     }
-  }, [currentIndex, text, speed, onComplete]);
+  }, [text, speed, onComplete]);
 
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);

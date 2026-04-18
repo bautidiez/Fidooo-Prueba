@@ -62,14 +62,20 @@ export function subscribeToMessages(
 
     /**
      * FIX CRÍTICO - ORDENAMIENTO DE ESCRITURAS PENDIENTES:
-     * Cuando Firebase guarda un mensaje (serverTimestamp), Firestore primero dispara un evento 
-     * con 'createdAt' en null. Esto puede desordenar la lista visualmente por milisegundos.
-     * Forzamos que los mensajes sin fecha (los más nuevos que se están guardando) aparezcan siempre al final.
+     * Cuando el usuario envía (prompt), Firestore tiene un delay hasta confirmar el timestamp.
+     * Si la IA responde muy rápido, el mensaje de la IA llega CON timestamp mientras el del usuario sigue en NULL.
+     * Forzamos que el mensaje del usuario (pendiente) aparezca SIEMPRE antes que la respuesta de la IA.
      */
     const sortedMessages = [...rawMessages].sort((a, b) => {
-      const timeA = a.createdAt?.toMillis?.() || Date.now() + 1000;
-      const timeB = b.createdAt?.toMillis?.() || Date.now() + 1000;
-      return timeA - timeB;
+      // Valor de tiempo para comparación (usamos 0 para pendientes de usuario, para que vayan al inicio de su bloque)
+      const getTime = (m: Message) => {
+        if (m.createdAt) return m.createdAt.toMillis();
+        // Si no tiene fecha, es una escritura local pendiente. 
+        // Le asignamos el tiempo actual, pero restamos 1ms si es usuario para que gane la posición anterior a la IA.
+        return Date.now() + (m.role === 'assistant' ? 1 : 0);
+      };
+
+      return getTime(a) - getTime(b);
     });
 
     callback(sortedMessages);
