@@ -29,9 +29,10 @@ async function bootstrap() {
   const origins = frontendUrl.split(',').map(u => u.trim()).filter(Boolean);
   
   app.enableCors({
-    origin: origins.length > 1 ? origins : origins[0] || '*',
+    origin: origins.length > 0 ? origins : '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
 
   // --- VALIDACIÓN GLOBAL ---

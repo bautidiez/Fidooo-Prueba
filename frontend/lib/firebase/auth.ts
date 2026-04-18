@@ -71,7 +71,7 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 
   try {
     const targetUrl = `${backendUrl}/auth/check-email`;
-    console.log(`[Auth] Checking email existence at: ${targetUrl}`);
+    console.log(`[Diagnostic] Verificando email en: ${targetUrl} (Backend URL: ${process.env.NEXT_PUBLIC_BACKEND_URL})`);
     
     // Si backendUrl es localhost, y estamos en móvil, esto fallará. 
     // Capturamos el error de red específicamente para avisar en consola.

@@ -19,11 +19,12 @@ async function bootstrap() {
     const configService = cachedApp.get(ConfigService);
     const frontendUrl = configService.get('frontendUrl', { infer: true });
 
-    // Enable CORS
+    // Enable CORS - Flexible origin to avoid blocking production frontend
     cachedApp.enableCors({
-      origin: frontendUrl,
+      origin: true, 
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     });
 
     // Global Filters (Diagnostic)

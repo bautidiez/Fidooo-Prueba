@@ -80,6 +80,8 @@ export function ChatWindow({ userId }: ChatWindowProps) {
 
       // 4. COMUNICACIÓN BACKEND:
       if (!currentConvId) throw new Error('ID de conversación no encontrado.');
+      
+      console.log(`[Diagnostic] Enviando mensaje a: ${BACKEND_URL}/chat`);
 
       const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
