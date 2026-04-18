@@ -17,13 +17,12 @@ interface TypewriterProps {
  * POR QUÉ: Produce un efecto visual de "IA escribiendo" que mejora la experiencia del usuario.
  * PROBLEMA QUE RESUELVE: Evita el despliegue brusco del texto largo y permite renderizado dinámico (Markdown).
  */
-export function Typewriter({ text, speed = 20, delay = 0, onComplete, children }: TypewriterProps) {
+export function Typewriter({ text, speed = 25, delay = 0, onComplete, children }: TypewriterProps) {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Reinicio total cuando cambia el texto base
   useEffect(() => {
-    // Reset si el texto cambia (nueva respuesta)
-    console.log(`[Typewriter] Iniciando animación para texto de largo: ${text.length}`);
     setDisplayText('');
     setCurrentIndex(0);
   }, [text]);

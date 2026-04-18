@@ -45,7 +45,16 @@ export function subscribeToMessages(
       id: doc.id,
       ...(doc.data() as Omit<Message, 'id'>),
     }));
-    callback(messages);
+
+    // Ordenamiento manual defensivo para manejar timestamps nulos (escrituras pendientes)
+    // Los mensajes con createdAt null deben ir al final.
+    const sortedMessages = [...messages].sort((a, b) => {
+      const timeA = a.createdAt?.toMillis?.() || Date.now() + 1000;
+      const timeB = b.createdAt?.toMillis?.() || Date.now() + 1000;
+      return timeA - timeB;
+    });
+
+    callback(sortedMessages);
   });
 }
 
