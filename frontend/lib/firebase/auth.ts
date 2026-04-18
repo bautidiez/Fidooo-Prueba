@@ -82,8 +82,8 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.warn(`[Auth] Backend responded with status: ${response.status}`);
-      return true; 
+      console.warn(`[Auth] Error en backend (${response.status}):`, targetUrl);
+      throw new Error(`Servidor de validación respondió con error ${response.status}. Verificá la URL del backend.`);
     }
 
     const data = await response.json();
@@ -93,11 +93,14 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     
     if (isNetworkError) {
       console.error('[Auth] Error de conexión al backend:', error);
-      throw new Error('No se pudo verificar el email. Problema de conexión con el servidor (BACKEND_URL).');
+      throw new Error('No se pudo conectar con el servidor de validación (BACKEND_URL). Verificá tu internet o la configuración en Vercel.');
     }
     
-    console.error('[Auth] Error checking email:', error);
-    return true; // En otros errores (parsing, etc), somos conservadores
+    // Si es un error que nosotros lanzamos arriba (404/500), lo relanzamos
+    if (error.message.includes('Servidor')) throw error;
+
+    console.error('[Auth] Error inesperado en validación:', error);
+    throw new Error('Error inesperado al verificar el email. Intentá de nuevo más tarde.');
   }
 }
 
