@@ -19,6 +19,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
  * QUÉ: Componente principal que orquesta el Sidebar y la Ventana de Chat.
  * POR QUÉ: Es la vista protegida central de la aplicación.
  * PROBLEMA QUE RESUELVE: Maneja la verificación de sesión y el estado de verificación de email antes de mostrar el chat.
+ */
 export default function ChatPage() {
   const [isResending, setIsResending] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
