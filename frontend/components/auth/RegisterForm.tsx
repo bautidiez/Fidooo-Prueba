@@ -39,8 +39,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
   async function handleSendVerification(user: any) {
     try {
-      const { sendEmailVerification } = await import('@/lib/firebase/auth');
-      await sendEmailVerification(user);
+      const { sendCustomEmailVerification } = await import('@/lib/firebase/auth');
+      await sendCustomEmailVerification(user);
       setVerificationSent(true);
       setCountdown(60);
       

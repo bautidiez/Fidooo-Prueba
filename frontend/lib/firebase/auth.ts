@@ -166,4 +166,19 @@ export function setSessionCookie(token: string): void {
   console.log(`[Auth] Cookie configurada en ${isSecure ? 'HTTPS' : 'HTTP'}. Estado: ${isSet ? 'ÉXITO' : 'FALLO'}`);
 }
 
-export { sendEmailVerification, getRedirectResult };
+/**
+ * Envía el email de verificación con configuraciones avanzadas para
+ * mejorar la compatibilidad en móviles y asegurar el redireccionamiento.
+ */
+export async function sendCustomEmailVerification(user: any): Promise<void> {
+  const actionCodeSettings = {
+    // La URL a la que el usuario será redirigido después de la verificación exitosa 
+    // (si el template de Firebase lo permite) o el link base que Firebase usará.
+    url: `${window.location.origin}/verify-email`,
+    handleCodeInApp: true,
+  };
+  
+  return sendEmailVerification(user, actionCodeSettings);
+}
+
+export { getRedirectResult };
