@@ -183,7 +183,7 @@ export function ChatWindow({ userId }: ChatWindowProps) {
 
               />
             ))}
-            {isReplying && <MessageBubbleSkeleton />}
+            {isReplying && messages[messages.length - 1]?.role !== 'assistant' && <MessageBubbleSkeleton />}
             <div ref={bottomRef} />
           </div>
         )}
