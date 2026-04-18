@@ -1,10 +1,14 @@
 /**
- * Capa de Persistencia y Tiempo Real con Firestore (Lado Cliente).
+ * CAPA DE PERSISTENCIA Y TIEMPO REAL - FIRESTORE (LADO CLIENTE)
  * 
- * QUÉ: Gestiona la lectura, escritura y escucha activa (listeners) de mensajes y conversaciones.
- * POR QUÉ: Centraliza el modelo de datos y las consultas complejas de base de datos.
- * PROBLEMA QUE RESUELVE: Provee una API limpia al frontend para manejar chats sincronizados sin latencia percibida.
+ * QUÉ HACE: Gestiona la lectura, escritura y escucha activa (listeners) de mensajes y conversaciones.
+ * POR QUÉ EXISTE: Centraliza el modelo de datos y las consultas de base de datos para todo el frontend.
+ * PROBLEMAS QUE RESUELVE:
+ * 1. Sincronización en tiempo real: Permite que el chat se actualice solo cuando llega una respuesta de la IA.
+ * 2. Latencia Percibida: Maneja el guardado local y sincronización con el servidor.
+ * 3. Consistencia de Datos: Garantiza que los mensajes se muestren en el orden cronológico correcto.
  */
+
 import {
   getFirestore,
   collection,
@@ -25,12 +29,20 @@ import {
 import { app } from './config';
 import type { Message, MessageRole, Conversation } from '@/types/message.types';
 
+/** Instancia central de la base de datos Firestore */
 const db: Firestore = getFirestore(app);
 
 export { db };
 
 /**
- * Listen to messages in a specific conversation
+ * ESCUCHA DE MENSAJES EN TIEMPO REAL
+ * 
+ * Conecta el frontend con una conversación específica en Firestore y notifica cualquier cambio.
+ * 
+ * @param userId - ID del usuario propietario de los mensajes.
+ * @param conversationId - ID de la conversación a observar.
+ * @param callback - Función que se ejecuta cada vez que el listado de mensajes cambia.
+ * @returns Función de desuscripción para limpiar el listener y ahorrar recursos.
  */
 export function subscribeToMessages(
   userId: string,
@@ -38,17 +50,23 @@ export function subscribeToMessages(
   callback: (messages: Message[]) => void,
 ): Unsubscribe {
   const messagesRef = collection(db, 'chats', userId, 'conversations', conversationId, 'messages');
+  
+  // Consultamos por fecha de creación ascendente
   const q = query(messagesRef, orderBy('createdAt', 'asc'));
 
   return onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
-    const messages: Message[] = snapshot.docs.map((doc) => ({
+    const rawMessages: Message[] = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...(doc.data() as Omit<Message, 'id'>),
     }));
 
-    // Ordenamiento manual defensivo para manejar timestamps nulos (escrituras pendientes)
-    // Los mensajes con createdAt null deben ir al final.
-    const sortedMessages = [...messages].sort((a, b) => {
+    /**
+     * FIX CRÍTICO - ORDENAMIENTO DE ESCRITURAS PENDIENTES:
+     * Cuando Firebase guarda un mensaje (serverTimestamp), Firestore primero dispara un evento 
+     * con 'createdAt' en null. Esto puede desordenar la lista visualmente por milisegundos.
+     * Forzamos que los mensajes sin fecha (los más nuevos que se están guardando) aparezcan siempre al final.
+     */
+    const sortedMessages = [...rawMessages].sort((a, b) => {
       const timeA = a.createdAt?.toMillis?.() || Date.now() + 1000;
       const timeB = b.createdAt?.toMillis?.() || Date.now() + 1000;
       return timeA - timeB;
@@ -59,7 +77,12 @@ export function subscribeToMessages(
 }
 
 /**
- * Get all conversations for a user
+ * ESCUCHA DE CONVERSACIONES EN TIEMPO REAL
+ * 
+ * Recupera el historial de chats del usuario para mostrarlo en el Sidebar lateral.
+ * 
+ * @param userId - ID del usuario.
+ * @param callback - Función que recibe la lista de conversaciones.
  */
 export function subscribeToConversations(
   userId: string,
@@ -78,7 +101,13 @@ export function subscribeToConversations(
 }
 
 /**
- * Create a new conversation entry
+ * CREACIÓN DE NUEVA CONVERSACIÓN
+ * 
+ * Inicializa un documento de conversación vacío en Firestore.
+ * 
+ * @param userId - ID del usuario.
+ * @param title - Título inicial (si no se provee, se usa uno por defecto).
+ * @returns ID único de la nueva conversación.
  */
 export async function createConversation(userId: string, title: string = 'Nueva conversación'): Promise<string> {
   const convsRef = collection(db, 'chats', userId, 'conversations');
@@ -94,7 +123,14 @@ export async function createConversation(userId: string, title: string = 'Nueva 
 }
 
 /**
- * Add a message to a specific conversation
+ * PERSISTENCIA DE MENSAJES (Lado Cliente)
+ * 
+ * Guarda un mensaje en la subcolección de una conversación y actualiza los metadatos globales.
+ * 
+ * @param userId - ID del usuario.
+ * @param conversationId - ID de la conversación destino.
+ * @param content - Texto del mensaje.
+ * @param role - Rol del emisor ('user' o 'assistant').
  */
 export async function addMessage(
   userId: string,
@@ -105,7 +141,7 @@ export async function addMessage(
   const messagesRef = collection(db, 'chats', userId, 'conversations', conversationId, 'messages');
   const convRef = doc(db, 'chats', userId, 'conversations', conversationId);
 
-  // 1. Add message
+  // 1. Inserción del mensaje con timestamp del servidor
   await addDoc(messagesRef, {
     content,
     role,
@@ -113,7 +149,7 @@ export async function addMessage(
     createdAt: serverTimestamp(),
   });
 
-  // 2. If it's the first user message, update the title
+  // 2. Lógica de Título Dinámico: Si es el primer mensaje del usuario, definimos el título del chat.
   if (role === 'user') {
     const snapshot = await getDocs(messagesRef);
     if (snapshot.size <= 1) {
@@ -122,14 +158,16 @@ export async function addMessage(
     }
   }
 
-  // 3. Update updatedAt
+  // 3. Toque de Actividad: Actualizamos 'updatedAt' para que el chat suba al tope en el Sidebar.
   await setDoc(convRef, {
     updatedAt: serverTimestamp(),
   }, { merge: true });
 }
 
 /**
- * Delete a specific conversation and its messages
+ * ELIMINACIÓN DE CHATS
+ * 
+ * Borra una conversación completa y todos sus mensajes asociados.
  */
 export async function deleteConversation(userId: string, conversationId: string): Promise<void> {
   const messagesRef = collection(db, 'chats', userId, 'conversations', conversationId, 'messages');
@@ -142,7 +180,9 @@ export async function deleteConversation(userId: string, conversationId: string)
 }
 
 /**
- * Legacy support for clear chat (deletes messages of active conversation)
+ * LIMPIEZA DE CHAT (Legacy Support)
+ * 
+ * Simplemente un alias para borrar la conversación seleccionada.
  */
 export async function clearChat(userId: string, conversationId?: string): Promise<void> {
   if (!conversationId) return;

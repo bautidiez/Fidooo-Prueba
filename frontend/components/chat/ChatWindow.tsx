@@ -22,120 +22,89 @@ if (BACKEND_URL && !BACKEND_URL.startsWith('http')) {
   BACKEND_URL = `https://${BACKEND_URL}`;
 }
 BACKEND_URL = BACKEND_URL.replace(/\/$/, ''); // Quitar barra final si existe
+BACKEND_URL = BACKEND_URL.replace(/\/$/, '');
 
 /**
- * Ventana principal de mensajes del chat.
+ * COMPONENTE CHATWINDOW (Área Central de Mensajes)
  * 
- * QUÉ: Contenedor que muestra la lista de mensajes y el input de envío.
- * POR QUÉ: Es el área central de interacción de la aplicación.
- * PROBLEMA QUE RESUELVE: Coordina el envío de mensajes al servidor (IA) y la visualización reactiva.
+ * QUÉ HACE: Orquesta la visualización de mensajes, el estado de carga y el envío de nuevos prompts.
+ * POR QUÉ EXISTE: Es el corazón de la interacción del usuario con la IA.
+ * PROBLEMAS QUE RESUELVE:
+ * 1. Envío y Recepción: Coordina con el backend de NestJS y escucha a Firestore.
+ * 2. Feedback Visual: Gestiona el estado 'isReplying' para mostrar el esqueleto (dots).
+ * 3. UX de Desplazamiento: Garantiza que el chat siempre baje automáticamente al recibir mensajes.
+ * 
+ * NOTA SOBRE ORDENAMIENTO: El hook useRealtimeMessages realiza un ordenamiento crítico en el cliente 
+ * (basado en el timestamp de Firestore) para asegurar que los mensajes aparezcan cronológicamente 
+ * correctos, evitando saltos visuales cuando la red entrega paquetes fuera de orden.
  */
 export function ChatWindow({ userId }: ChatWindowProps) {
+  // --- HOOKS DE ESTADO Y DATOS ---
   const { user } = useAuth();
   const { activeConversationId, setActiveConversationId, setReplying, isReplying } = useChatStore();
+  
+  // Sincronización en tiempo real: Recuperamos los mensajes de Firestore usando un hook personalizado.
   const { messages } = useRealtimeMessages(userId, activeConversationId);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Información del perfil para las burbujas de usuario
   const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Usuario';
   const userInitials = displayName.slice(0, 2).toUpperCase();
   const userPhotoURL = user?.photoURL;
 
-  // Auto-scroll to bottom on new messages
+  /**
+   * AUTO-SCROLL: Cada vez que hay un mensaje nuevo o cambia el estado de carga, bajamos al final.
+   */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isReplying]);
 
   /**
-   * MANEJADOR DE ENVÍO DE MENSAJES:
-   * 
-   * @param {string} content - Texto del mensaje del usuario.
-   * 
-   * FLUJO TÉCNICO:
-   * 1. Activa el estado 'replying' para bloquear el input y mostrar feedback visual.
-   * 2. Si es el primer mensaje, crea una 'conversation' nueva en Firestore.
-   * 3. Guarda el mensaje del 'user' en Firestore (Client SDK).
-   * 4. Obtiene el Firebase ID Token (JWT) para autenticarse contra el Backend NestJS.
-   * 5. Realiza un POST al backend enviando el prompt y el ID de conversación.
-   * 6. El backend procesará con la IA y guardará la respuesta en Firestore.
+   * MANEJADOR DE ENVÍO (Lógica de Negocio)
    */
   async function handleSend(content: string): Promise<void> {
-    setReplying(true);
+    setReplying(true); // Bloqueamos UI y mostramos esqueleto
 
     try {
       let currentConvId = activeConversationId;
 
-      // 1. Persistencia de la conversación inicial:
+      // 1. Si es un chat nuevo, creamos el documento de conversación
       if (!currentConvId) {
         currentConvId = await createConversation(userId, content.slice(0, 40));
-        if (!currentConvId) throw new Error('No se pudo crear la conversación en Firebase.');
+        if (!currentConvId) throw new Error('No se pudo crear la conversación.');
         setActiveConversationId(currentConvId);
       }
 
-      // 2. Persistencia del mensaje del usuario (Client Side):
+      // 2. Guardamos el mensaje del usuario inmediatamente
       await addMessage(userId, currentConvId, content, 'user');
 
-      // 3. SEGURIDAD: Obtención del JWT de Firebase para validación en NestJS:
+      // 3. Obtenemos credenciales de Firebase para el backend
       const idToken = await getIdToken();
-      if (!idToken) throw new Error('Sesión expirada. Por favor, reingresá.');
+      if (!idToken) throw new Error('Sesión inválida.');
 
-      // 4. COMUNICACIÓN BACKEND:
-      if (!currentConvId) throw new Error('ID de conversación no encontrado.');
-      
-      console.log(`[Diagnostic] Enviando mensaje a: ${BACKEND_URL}/chat`);
-
-      const response = await fetch(`${BACKEND_URL}/chat`, {
+      // 4. Llamada al Backend NestJS
+      await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`, // Header fundamental para el AuthGuard
+          'Authorization': `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ 
-          message: content,
-          conversationId: currentConvId 
-        }),
+        body: JSON.stringify({ message: content, conversationId: currentConvId }),
       });
 
-      // Manejo defensivo de errores del servidor:
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = (await response.json()) as { message?: string };
-          throw new Error(data.message ?? 'Error en la respuesta de IA');
-        } else {
-          throw new Error('Error en la comunicación con el servidor AI.');
-        }
-      }
-
-      // IMPORTANTE: La respuesta del asistente NO se maneja aquí.
-      // Se maneja a través del listener onSnapshot de Firestore en el hook useRealtimeMessages.
     } catch (error: any) {
-      console.error('Error sending message:', error);
-      
-      let errorMessage = error.message || 'Error de conexión / Permisos';
-      
-      // Detección específica de errores de red (Fetch failed)
-      const isFetchError = error instanceof TypeError || errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch');
-      
-      if (isFetchError) {
-        errorMessage = 'No se pudo conectar con Fidooo AI. Verificá tu conexión o la configuración del servidor (NEXT_PUBLIC_BACKEND_URL).';
-      }
-      
-      // Fallback: Mostrar el error como un mensaje del asistente para mejorar la UX:
-      if (activeConversationId) {
-        try {
-          await addMessage(userId, activeConversationId, `⚠️ Error: ${errorMessage}`, 'assistant');
-        } catch (e) {
-          Swal.fire({ title: 'Falla de Conexión', text: errorMessage, icon: 'error' });
-        }
-      } else {
-        Swal.fire({ title: 'Falla de Conexión', text: errorMessage, icon: 'error' });
-      }
-    } finally {
-      setReplying(false);
+      console.error('Error en ChatWindow:', error);
+      Swal.fire({ title: 'Error', text: error.message, icon: 'error' });
     }
   }
 
-  // Proactive skeleton cleanup: If the last message is from the assistant, we are no longer replying.
+  /**
+   * FIX CRÍTICO: LIMPIEZA REACTIVA DEL ESQUELETO
+   * 
+   * PROBLEMA: Los puntos suspensivos a veces se quedan "pegados" debajo del mensaje real por latencia del servidor.
+   * SOLUCIÓN: En cuanto detectamos que el ÚLTIMO mensaje en la lista es de tipo 'assistant', 
+   * forzamos que se quite el estado de carga, incluso si la petición HTTP no ha terminado de cerrarse.
+   */
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (lastMessage?.role === 'assistant' && isReplying) {
@@ -145,53 +114,49 @@ export function ChatWindow({ userId }: ChatWindowProps) {
 
   return (
     <div className="flex h-full flex-col relative">
-      {/* Background Watermark */}
+      {/* CAPA: MARCA DE AGUA (Logotipo de fondo suave) */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden z-0 opacity-[0.04]">
         <div className="relative w-[400px] h-[400px]">
-           <Image 
-             src="/assets/logo.png" 
-             alt="Watermark" 
-             fill 
-             className="object-contain grayscale brightness-200 contrast-150" 
-           />
+           <Image src="/assets/logo.png" alt="Watermark" fill className="object-contain grayscale" />
         </div>
       </div>
 
-      {/* Messages area */}
+      {/* ÁREA DE MENSAJES: Lista scrollable con scrollbar fino personalizado */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 relative z-10" style={{ scrollbarWidth: 'thin' }}>
         {messages.length === 0 ? (
-        <div className="flex h-full flex-col items-center justify-center p-4">
-          <div className="mb-6 flex size-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-[#1ebbf4]/20 to-[#84d6f6]/10 ring-1 ring-[#1ebbf4]/30 shadow-[0_0_50px_rgba(30,187,244,0.1)] animate-pulse overflow-hidden relative group">
-             <Image 
-               src="/assets/logo.png" 
-               alt="AI" 
-               fill 
-               className="object-contain p-4 transition-transform duration-1000 group-hover:scale-110" 
-             />
+          // Vista de bienvenida cuando no hay mensajes todavía
+          <div className="flex h-full flex-col items-center justify-center p-4 text-center">
+            <div className="mb-6 size-24 relative animate-pulse">
+               <Image src="/assets/logo.png" alt="AI" fill className="object-contain opacity-40" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Iniciá una conversación</h2>
+            <p className="text-white/50 text-sm max-w-xs">Preguntame lo que quieras, Fidooo AI está para ayudarte.</p>
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-white tracking-tight drop-shadow-sm">Iniciá una conversación</h2>
-          <p className="text-center text-sm text-white/50 max-w-xs leading-relaxed">
-            Escribí cualquier cosa y <span className="text-[#1ebbf4] font-semibold drop-shadow-[0_0_8px_rgba(30,187,244,0.3)]">Fidooo AI</span> te responderá al instante.
-          </p>
-        </div>
         ) : (
           <div className="flex flex-col gap-4">
+            {/* Renderizado de la lista de burbujas */}
             {messages.map((message, index) => (
               <MessageBubble 
                 key={message.id} 
                 message={message} 
                 userPhotoURL={message.role === 'user' ? userPhotoURL : null}
                 userInitials={userInitials}
+                // SOLO animamos el efecto máquina de escribir si es el último mensaje y es de la IA
                 animate={index === messages.length - 1 && message.role === 'assistant'}
               />
             ))}
-            {isReplying && messages.some(m => m.role === 'assistant') && messages[messages.length - 1]?.role !== 'assistant' ? null : (isReplying && messages[messages.length - 1]?.role !== 'assistant' && <MessageBubbleSkeleton />)}
+            
+            {/* ESQUELETO DE CARGA: Sólo si estamos esperando y el último no es todavía la IA */}
+            {isReplying && messages[messages.length - 1]?.role !== 'assistant' && (
+              <MessageBubbleSkeleton />
+            )}
+            
             <div ref={bottomRef} />
           </div>
         )}
       </div>
 
-      {/* Input */}
+      {/* INPUT BAR: Control de entrada del usuario */}
       <MessageInput onSend={handleSend} isDisabled={isReplying} />
     </div>
   );

@@ -19,22 +19,25 @@ function formatTime(createdAt: Message['createdAt']): string {
 }
 
 /**
- * Burbuja de Mensaje Individual.
+ * COMPONENTE MESSAGEBUBBLE (Burbuja de Chat)
  * 
- * QUÉ: Representa visualmente un mensaje de usuario o de la IA.
- * POR QUÉ: Centraliza el estilo y la lógica de renderizado según el rol (user/assistant).
- * PROBLEMA QUE RESUELVE: Maneja el formato de texto y la alineación responsiva de los mensajes.
+ * QUÉ HACE: Renderiza un mensaje individual, ya sea del usuario o de la IA.
+ * POR QUÉ EXISTE: Es la unidad básica de la interfaz de chat.
+ * PROBLEMAS QUE RESUELVE:
+ * 1. Diferenciación Visual: Gestiona la alineación (izquierda/derecha) y colores según el rol.
+ * 2. Formato: Integra ReactMarkdown para mostrar negritas, listas y código.
+ * 3. Interactividad: Soporta el efecto de escritura (Typewriter) para la IA.
  */
 export function MessageBubble({ message, userPhotoURL, userInitials, animate }: MessageBubbleProps) {
-
   const isUser = message.role === 'user';
 
   return (
     <div
       className={`flex w-full gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-2`}
+      // Animación suave de entrada de la burbuja completa
       style={{ animation: 'slideIn 0.3s ease-out forwards' }}
     >
-      {/* Avatar */}
+      {/* SECCIÓN: AVATAR / LOGO */}
       <div
         className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold ring-1 overflow-hidden shadow-lg ${
           isUser
@@ -43,6 +46,7 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
         }`}
       >
         {isUser ? (
+          // Avatar del usuario (foto de Google o iniciales)
           userPhotoURL ? (
             <img src={userPhotoURL} alt="User" className="size-full object-cover" />
           ) : (
@@ -51,11 +55,12 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
             </div>
           )
         ) : (
+          // Logo de Fidooo para la IA
           <img src="/assets/assistant-logo.png" alt="AI" className="size-full object-cover" />
         )}
       </div>
 
-      {/* Bubble */}
+      {/* SECCIÓN: CONTENIDO DEL MENSAJE */}
       <div
         className={`relative max-w-[80%] rounded-3xl px-5 py-4 text-[15px] leading-relaxed backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
           isUser
@@ -63,19 +68,16 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
             : 'rounded-tl-sm border border-[#1ebbf4]/20 bg-gradient-to-br from-[#1ebbf4]/10 to-[#84d6f6]/5 text-white/90 shadow-[0_0_15px_rgba(30,187,244,0.1)]'
         }`}
       >
+        {/* RENDERIZADO CONDICIONAL: Si es el último mensaje de la IA, usamos Typewriter. Si no, renderizado directo. */}
         {animate && message.role === 'assistant' ? (
-          <Typewriter key={message.id} text={message.content} speed={30}>
-
-
-
+          <Typewriter key={message.id} text={message.content} speed={40}>
             {(partialText) => (
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
+                  // Estilización personalizada de Markdown para que coincida con el diseño premium
                   p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
                   strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
-
-
                   em: ({ children }) => <em className="italic text-white underline decoration-[#1ebbf4]/40 underline-offset-4">{children}</em>,
                   ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
                   ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
@@ -92,7 +94,6 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
             components={{
               p: ({ children }) => <p className="m-0 whitespace-pre-wrap break-words">{children}</p>,
               strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
-
               em: ({ children }) => <em className="italic text-white underline decoration-[#1ebbf4]/40 underline-offset-4">{children}</em>,
               ul: ({ children }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
               ol: ({ children }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
@@ -103,6 +104,7 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
           </ReactMarkdown>
         )}
 
+        {/* METADATO: Hora del mensaje */}
         <span
           className={`mt-2 block text-right text-[10px] uppercase tracking-wider font-semibold ${isUser ? 'text-white/40' : 'text-[#1ebbf4]/70'}`}
         >
@@ -113,6 +115,11 @@ export function MessageBubble({ message, userPhotoURL, userInitials, animate }: 
   );
 }
 
+/**
+ * ESQUELETO DE CARGA (Thinking State)
+ * 
+ * Se muestra mientras la IA está generando una respuesta en el backend.
+ */
 export function MessageBubbleSkeleton() {
   return (
     <div className="flex w-full flex-row gap-4 mb-2 animate-pulse" style={{ animation: 'slideIn 0.3s ease-out forwards' }}>
