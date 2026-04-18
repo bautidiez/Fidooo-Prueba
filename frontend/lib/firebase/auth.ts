@@ -177,8 +177,10 @@ export async function sendCustomEmailVerification(user: any): Promise<void> {
     : 'https://fidooo-prueba.vercel.app';
 
   const actionCodeSettings = {
+    // URL de retorno estándar. Google abrirá primero su página de éxito 
+    // y luego mostrará un botón de "Continuar" hacia Fiboo. 
+    // Esta es la forma más compatible con celulares.
     url: `${domain}/verify-email`,
-    handleCodeInApp: true,
   };
   
   return sendEmailVerification(user, actionCodeSettings);
