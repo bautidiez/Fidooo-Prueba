@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,8 +19,10 @@ import { Sidebar } from '@/components/layout/Sidebar';
  * QUÉ: Componente principal que orquesta el Sidebar y la Ventana de Chat.
  * POR QUÉ: Es la vista protegida central de la aplicación.
  * PROBLEMA QUE RESUELVE: Maneja la verificación de sesión y el estado de verificación de email antes de mostrar el chat.
- */
 export default function ChatPage() {
+  const [isResending, setIsResending] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
+
   const router = useRouter();
   const { user, isLoading } = useAuth(); // Hook que monitorea la sesión activa
   const { isSidebarOpen, setSidebarOpen } = useChatStore(); // Estado global del layout
@@ -57,6 +60,40 @@ export default function ChatPage() {
    * Si el usuario no ha verificado su cuenta, no puede ver el chat.
    */
   if (!user.emailVerified) {
+    const handleResend = async () => {
+      if (resendCountdown > 0 || isResending) return;
+      
+      setIsResending(true);
+      try {
+        const { sendCustomEmailVerification } = await import('@/lib/firebase/auth');
+        await sendCustomEmailVerification(user);
+        
+        Swal.fire({
+          title: 'Email enviado',
+          text: `Te enviamos un nuevo link a ${user.email}. No olvides revisar Spam.`,
+          icon: 'success',
+          background: '#1c1c1c',
+          color: '#fff',
+          confirmButtonColor: '#1ebbf4',
+        });
+
+        setResendCountdown(60);
+        const timer = setInterval(() => {
+          setResendCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } catch (error) {
+        console.error('Error resending email:', error);
+      } finally {
+        setIsResending(false);
+      }
+    };
+
     return (
       <div className="flex h-dvh flex-col items-center justify-start bg-[#1c1c1c] px-4 pt-20 relative overflow-hidden">
         {/* UI de Bloqueo por falta de verificación */}
@@ -71,22 +108,30 @@ export default function ChatPage() {
             
             <h2 className="mb-3 text-2xl font-bold text-white tracking-tight">Activación de Cuenta</h2>
             <p className="mb-8 text-sm text-white/50 leading-relaxed max-w-xs">
-              Tu cuenta de <span className="text-[#1ebbf4] font-semibold">{user.email}</span> ya casi está lista. Si acabas de verificar tu email, ya podés entrar.
+              Tu cuenta de <span className="text-[#1ebbf4] font-semibold">{user.email}</span> casi está lista. Verificá tu bandeja de entrada para poder chatear.
             </p>
 
             <div className="flex w-full flex-col gap-3">
               <button
-                onClick={() => window.location.reload()}
-                className="w-full rounded-2xl bg-gradient-to-r from-[#1ebbf4] to-[#84d6f6] px-6 py-3 text-sm font-bold text-[#0a0a0f] transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-[0_0_20px_rgba(30,187,244,0.3)]"
+                onClick={handleResend}
+                disabled={resendCountdown > 0 || isResending}
+                className="w-full rounded-2xl bg-gradient-to-r from-[#1ebbf4] to-[#84d6f6] px-6 py-3 text-sm font-bold text-[#0a0a0f] transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100 cursor-pointer shadow-[0_0_20px_rgba(30,187,244,0.3)]"
               >
-                Ir a Fidooo Chat
+                {resendCountdown > 0 ? `Reenviar en ${resendCountdown}s` : '¿No llegó el mail? Reenviar ahora'}
               </button>
               
               <button
-                onClick={handleSignOut}
-                className="w-full rounded-2xl px-6 py-3 text-sm font-bold text-white/40 transition-all hover:text-white cursor-pointer"
+                onClick={() => window.location.reload()}
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 cursor-pointer"
               >
-                Volver al Login / Salir
+                Ya verifiqué mi cuenta
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                className="mt-4 text-xs font-bold text-white/30 transition-all hover:text-white/60 cursor-pointer uppercase tracking-widest"
+              >
+                Cerrar sesión
               </button>
             </div>
         </div>
